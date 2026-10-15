@@ -1,45 +1,34 @@
-import { useRef } from 'react';
-import { motion, useAnimationFrame, useMotionValue } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface MarqueeProps {
   items: string[];
   speed?: number;
-  className?: string;
 }
 
-export function Marquee({ items, speed = 40, className = '' }: MarqueeProps) {
-  const x = useMotionValue(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useAnimationFrame((_, delta) => {
-    if (!contentRef.current) return;
-    const width = contentRef.current.scrollWidth / 2;
-    x.set((x.get() - (speed * delta) / 1000) % -width);
-  });
-
-  const doubled = [...items, ...items];
+export function Marquee({ items, speed = 28 }: MarqueeProps) {
+  const repeated = [...items, ...items, ...items];
 
   return (
     <div
-      ref={containerRef}
-      className={`overflow-hidden whitespace-nowrap ${className}`}
+      className="w-full overflow-hidden bg-charcoal-900 border-y border-charcoal-800 py-4 select-none relative"
       aria-hidden="true"
     >
       <motion.div
-        ref={contentRef}
-        style={{ x }}
-        className="inline-flex gap-0"
+        animate={{ x: ['0%', '-33.333%'] }}
+        transition={{
+          repeat: Infinity,
+          ease: 'linear',
+          duration: speed,
+        }}
+        className="flex items-center gap-10 whitespace-nowrap will-change-transform"
       >
-        {doubled.map((item, i) => (
-          <span
-            key={i}
-            className="inline-flex items-center gap-6 pr-6 text-ash/40 font-black uppercase tracking-widest"
-            style={{ fontSize: 'clamp(0.7rem, 2vw, 1.1rem)' }}
-          >
-            {item}
-            <span className="text-gold" style={{ fontSize: '0.5em' }}>●</span>
-          </span>
+        {repeated.map((item, index) => (
+          <div key={index} className="flex items-center gap-10">
+            <span className="font-space text-xs sm:text-sm tracking-[0.25em] text-warm-white/90 font-semibold uppercase">
+              {item}
+            </span>
+            <span className="w-2 h-2 rounded-full bg-lime text-glow-lime flex-shrink-0" />
+          </div>
         ))}
       </motion.div>
     </div>

@@ -8,40 +8,48 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Outfit', 'sans-serif'],
-        display: ['Outfit', 'sans-serif'],
+        display: ['Syne', 'Outfit', 'sans-serif'],
+        space: ['"Space Grotesk"', 'Outfit', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {
-        ink: {
-          DEFAULT: '#0a0a0a',
-          soft: '#111111',
-          mid: '#1a1a1a',
-          border: '#222222',
+        charcoal: {
+          950: '#060608',
+          900: '#0b0b0f',
+          850: '#111116',
+          800: '#171720',
+          700: '#22222d',
+          600: '#30303e',
+          500: '#444456',
         },
-        ash: {
-          DEFAULT: '#888888',
-          light: '#aaaaaa',
-          dark: '#555555',
+        lime: {
+          DEFAULT: '#d4ff00',
+          hover: '#e0ff33',
+          muted: '#a8cc00',
+          subtle: 'rgba(212, 255, 0, 0.08)',
+          glow: 'rgba(212, 255, 0, 0.25)',
         },
-        cream: {
-          DEFAULT: '#f0ebe3',
-          bright: '#faf8f5',
-        },
-        gold: {
-          DEFAULT: '#c9a96e',
-          light: '#e5c99a',
-          dark: '#a07840',
+        warm: {
+          white: '#fbfbfa',
+          cream: '#eae8e1',
+          muted: '#9a9a9f',
+          dim: '#606068',
         },
       },
       letterSpacing: {
-        widest2: '0.25em',
-        widest3: '0.35em',
+        tightest: '-0.04em',
+        widest2: '0.22em',
+        widest3: '0.32em',
+        widest4: '0.42em',
       },
       fontSize: {
-        '10xl': '10rem',
-        '11xl': '12rem',
-        '12xl': '14rem',
+        '10xl': '9.5rem',
+        '11xl': '11.5rem',
+        '12xl': '13.5rem',
+        '13xl': '15.5rem',
       },
     },
   },
   plugins: [],
 }
+

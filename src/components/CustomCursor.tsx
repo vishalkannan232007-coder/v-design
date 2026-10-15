@@ -1,63 +1,76 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 export function CustomCursor() {
+  const [isVisible, setIsVisible] = useState(false);
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
-  const labelRef = useRef<HTMLSpanElement>(null);
 
-  const springConfig = { damping: 22, stiffness: 280, mass: 0.5 };
-  const cursorXSpring = useSpring(cursorX, springConfig);
-  const cursorYSpring = useSpring(cursorY, springConfig);
+  const springConfigFast = { damping: 30, stiffness: 450, mass: 0.15 };
+  const springConfigTrail = { damping: 25, stiffness: 220, mass: 0.4 };
+
+  const cursorXSpring = useSpring(cursorX, springConfigFast);
+  const cursorYSpring = useSpring(cursorY, springConfigFast);
+
+  const trailXSpring = useSpring(cursorX, springConfigTrail);
+  const trailYSpring = useSpring(cursorY, springConfigTrail);
 
   useEffect(() => {
-    const moveCursor = (e: MouseEvent) => {
+    // Only activate for fine pointer devices (desktop mouse)
+    const isFinePointer = window.matchMedia('(pointer: fine)').matches;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!isFinePointer || prefersReducedMotion) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
       cursorX.set(e.clientX);
       cursorY.set(e.clientY);
-
-      const target = e.target as HTMLElement;
-      if (!labelRef.current) return;
-
-      if (target.closest('[data-cursor="view"]')) {
-        labelRef.current.textContent = 'VIEW';
-      } else if (target.closest('[data-cursor="open"]')) {
-        labelRef.current.textContent = 'OPEN';
-      } else if (target.closest('[data-cursor="explore"]')) {
-        labelRef.current.textContent = 'EXPLORE';
-      } else {
-        labelRef.current.textContent = '';
-      }
+      if (!isVisible) setIsVisible(true);
     };
 
-    window.addEventListener('mousemove', moveCursor);
-    return () => window.removeEventListener('mousemove', moveCursor);
-  }, [cursorX, cursorY]);
+    const handleMouseLeave = () => {
+      setIsVisible(false);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    document.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, [cursorX, cursorY, isVisible]);
+
+  if (!isVisible) return null;
 
   return (
-    <motion.div
-      className="fixed top-0 left-0 pointer-events-none z-[9999] hidden md:flex items-center justify-center"
-      style={{
-        x: cursorXSpring,
-        y: cursorYSpring,
-        translateX: '-50%',
-        translateY: '-50%',
-      }}
-    >
-      {/* Outer ring */}
-      <div
-        className="absolute rounded-full border border-cream/40"
-        style={{ width: 32, height: 32 }}
-      />
-      {/* Dot */}
-      <div
-        className="rounded-full bg-cream"
-        style={{ width: 4, height: 4 }}
-      />
-      {/* Label */}
-      <span
-        ref={labelRef}
-        className="absolute top-full mt-2 left-1/2 -translate-x-1/2 text-[9px] font-bold tracking-widest text-cream whitespace-nowrap"
-      />
-    </motion.div>
+    <>
+      {/* Outer Spring Follower Ring */}
+      <motion.div
+        className="fixed top-0 left-0 pointer-events-none z-[9998] hidden lg:block"
+        style={{
+          x: trailXSpring,
+          y: trailYSpring,
+          translateX: '-50%',
+          translateY: '-50%',
+        }}
+        aria-hidden="true"
+      >
+        <div className="w-8 h-8 rounded-full border border-lime/40" />
+      </motion.div>
+
+      {/* Center Precise Dot */}
+      <motion.div
+        className="fixed top-0 left-0 pointer-events-none z-[9999] hidden lg:block"
+        style={{
+          x: cursorXSpring,
+          y: cursorYSpring,
+          translateX: '-50%',
+          translateY: '-50%',
+        }}
+        aria-hidden="true"
+      >
+        <div className="w-2 h-2 rounded-full bg-lime shadow-[0_0_10px_rgba(212,255,0,0.8)]" />
+      </motion.div>
+    </>
   );
 }

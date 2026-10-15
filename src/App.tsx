@@ -3,58 +3,63 @@ import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
 import { Marquee } from './components/Marquee';
 import { HeroSection } from './sections/HeroSection';
-import { IntroSection } from './sections/IntroSection';
 import { WorkSection } from './sections/WorkSection';
 import { ServicesSection } from './sections/ServicesSection';
 import { AboutSection } from './sections/AboutSection';
+import { PhilosophySection } from './sections/PhilosophySection';
 import { ProcessSection } from './sections/ProcessSection';
-import { CapabilitiesSection } from './sections/CapabilitiesSection';
-import { CtaSection } from './sections/CtaSection';
 import { ContactSection } from './sections/ContactSection';
 
-const marqueeItems = [
-  'Logo Design',
-  'Brand Identity',
-  'Web Design',
-  'UI/UX',
-  'Video Editing',
-  'Motion Design',
-  'Art Direction',
-  'Visual Identity',
-  'Colour Systems',
-  'Typography',
+const showreelTicker = [
+  'BRAND IDENTITY',
+  'WEBSITE & UI/UX',
+  'CINEMATIC VIDEO',
+  'MOTION GRAPHICS',
+  'SOCIAL CREATIVES',
+  'LOGO DESIGN',
+  'INDEPENDENT BY DESIGN',
+  'WE DESIGN IDENTITIES',
 ];
 
 function App() {
   return (
-    <>
-      {/* Custom cursor — desktop only */}
+    <div className="bg-charcoal-950 text-warm-white min-h-screen selection:bg-lime selection:text-charcoal-950 font-sans">
+      {/* Precision custom cursor for fine desktop pointers */}
       <CustomCursor />
 
-      {/* Navigation */}
+      {/* Primary Sticky Navigation */}
       <Navigation />
 
-      {/* Main content */}
+      {/* Full-page guided experience */}
       <main>
+        {/* CHAPTER 01 — THE OPENING (Hero) */}
         <HeroSection />
 
-        {/* Marquee strip between Hero and Intro */}
-        <div className="border-t border-b border-ink-border py-4 overflow-hidden bg-[#0d0d0d]">
-          <Marquee items={marqueeItems} speed={45} />
-        </div>
+        {/* Studio Disciplines Kinetic Transition */}
+        <Marquee items={showreelTicker} speed={24} />
 
-        <IntroSection />
+        {/* CHAPTER 02 — THE WORK (Selected Portfolio) */}
         <WorkSection />
+
+        {/* CHAPTER 03 — WHAT WE CREATE (Services) */}
         <ServicesSection />
+
+        {/* CHAPTER 04 — THE STUDIO (About) */}
         <AboutSection />
+
+        {/* PHILOSOPHY — Great Design is Remembered */}
+        <PhilosophySection />
+
+        {/* PROCESS — Four Stages */}
         <ProcessSection />
-        <CapabilitiesSection />
-        <CtaSection />
+
+        {/* CHAPTER 05 — LET'S BUILD SOMETHING DISTINCTIVE (Contact) */}
         <ContactSection />
       </main>
 
+      {/* Studio Footer */}
       <Footer />
-    </>
+    </div>
   );
 }
 

@@ -1,23 +1,24 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import vDesignLogo from '../assets/brand/V-DESIGN-LOGO.png';
+import { ArrowUpRight, ArrowDown, Play, Sparkles } from 'lucide-react';
+import { projects } from '../data/projects';
 
-const EASE_CINEMATIC: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const EASE_EDITORIAL: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 export function HeroSection() {
-  const [introDone, setIntroDone] = useState(false);
+  const [activeProjectIndex, setActiveProjectIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
 
+  // Auto-advance showreel every 4.5 seconds
   useEffect(() => {
-    // Cinematic opening sequence timing: logo -> studio -> line -> light -> hero reveal
-    const timer = setTimeout(() => {
-      setIntroDone(true);
-    }, 2800);
-    return () => clearTimeout(timer);
-  }, []);
+    if (!isPlaying) return;
+    const interval = setInterval(() => {
+      setActiveProjectIndex((prev) => (prev + 1) % projects.length);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [isPlaying]);
 
-  const handleSkipIntro = () => {
-    setIntroDone(true);
-  };
+  const activeProject = projects[activeProjectIndex];
 
   const scrollToWork = () => {
     document.querySelector('#work')?.scrollIntoView({ behavior: 'smooth' });
@@ -29,284 +30,254 @@ export function HeroSection() {
 
   return (
     <section
-      id="hero"
-      className="relative min-h-[100svh] w-full flex flex-col justify-between overflow-hidden bg-[#0a0a0a]"
+      id="opening"
+      className="relative min-h-screen w-full flex flex-col justify-between pt-28 sm:pt-32 md:pt-36 pb-10 px-6 md:px-12 lg:px-16 bg-charcoal-950 overflow-hidden transition-colors duration-1000"
+      style={{
+        backgroundImage: [
+          `radial-gradient(ellipse 80% 65% at 72% 40%, ${activeProject.glowColor} 0%, transparent 65%)`,
+          `radial-gradient(ellipse 55% 50% at 20% 80%, rgba(180, 70, 10, 0.10) 0%, transparent 70%)`,
+          `radial-gradient(ellipse 40% 35% at 85% 85%, rgba(194, 100, 28, 0.06) 0%, transparent 60%)`,
+        ].join(', '),
+      }}
     >
-      {/* ══════════════════════════════════════════════════════
-          CINEMATIC INTRO OVERLAY (Plays on initial view)
-          Sequence: Black Screen -> Logo -> "CREATIVE DESIGN STUDIO" -> Line -> Light
-         ══════════════════════════════════════════════════════ */}
-      <AnimatePresence>
-        {!introDone && (
-          <motion.div
-            key="cinematic-curtain"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.9, ease: EASE_CINEMATIC } }}
-            onClick={handleSkipIntro}
-            className="fixed inset-0 z-[300] bg-[#070707] flex flex-col items-center justify-center p-6 cursor-pointer select-none"
-            title="Click to enter immediately"
-          >
-            {/* Subtle background light glow */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: [0, 0.4, 0.15], scale: [0.8, 1.2, 1] }}
-              transition={{ duration: 2.4, ease: 'easeOut' }}
-              className="absolute w-[340px] md:w-[600px] h-[340px] md:h-[600px] rounded-full pointer-events-none"
-              style={{
-                background:
-                  'radial-gradient(circle, rgba(201, 169, 110, 0.18) 0%, rgba(201, 169, 110, 0.04) 45%, transparent 70%)',
-                filter: 'blur(40px)',
-              }}
-            />
+      {/* Persistent warm amber base — cinematic atmosphere */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-100"
+        style={{
+          background: [
+            'radial-gradient(ellipse 50% 40% at 15% 15%, rgba(210,90,20,0.09) 0%, transparent 65%)',
+            'radial-gradient(ellipse 35% 30% at 90% 10%, rgba(220,110,30,0.06) 0%, transparent 60%)',
+          ].join(', '),
+        }}
+        aria-hidden="true"
+      />
 
-            <div className="relative z-10 flex flex-col items-center text-center max-w-md w-full">
-              {/* Step 1: Real V DESIGN Logo appears */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.92, y: 12 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ duration: 1.1, delay: 0.25, ease: EASE_CINEMATIC }}
-                className="mb-6"
+      {/* Dynamic Showreel Ambient Background Color Glow */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-40 transition-opacity duration-1000"
+        style={{
+          background: `radial-gradient(ellipse 65% 55% at 80% 40%, ${activeProject.glowColor}, transparent)`,
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Cinematic ambient breathe overlay */}
+      <div className="absolute inset-0 hero-cinematic-bg pointer-events-none" aria-hidden="true" />
+
+      {/* Restrained CSS ember particles */}
+      <div className="ember-container" aria-hidden="true">
+        <div className="ember ember-1" />
+        <div className="ember ember-2" />
+        <div className="ember ember-3" />
+        <div className="ember ember-4" />
+        <div className="ember ember-5" />
+      </div>
+
+      {/* Subtle Architectural Grid Lines */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.05] grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 max-w-7xl mx-auto px-6 md:px-12"
+        aria-hidden="true"
+      >
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div key={i} className="border-r border-warm-white h-full" />
+        ))}
+      </div>
+
+      {/* Chapter 01 Meta Tag */}
+      <div className="relative z-10 max-w-7xl mx-auto w-full pt-2 flex items-center justify-between border-b border-charcoal-800/80 pb-4">
+        <div className="flex items-center gap-3">
+          <span className="w-2 h-2 rounded-full bg-lime shadow-[0_0_10px_rgba(212,255,0,0.8)] animate-pulse" />
+          <span className="font-mono text-[0.65rem] tracking-[0.25em] text-lime font-bold uppercase">
+            CHAPTER 01 &mdash; THE OPENING
+          </span>
+        </div>
+        <div className="hidden sm:flex items-center gap-4 font-mono text-[0.62rem] text-warm-dim tracking-widest">
+          <span>PORTFOLIO SHOWREEL</span>
+          <span className="text-charcoal-700">/</span>
+          <span className="text-warm-muted">0{activeProjectIndex + 1} OF 0{projects.length}</span>
+        </div>
+      </div>
+
+      {/* Main Hero Grid: Typographic Statement + Interactive Portfolio Showreel */}
+      <div className="relative z-10 max-w-7xl mx-auto w-full my-auto py-8 sm:py-12 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+        {/* Left Column: Monumental Headline, Supporting Copy, and Dual CTAs */}
+        <div className="lg:col-span-7 space-y-6 sm:space-y-8">
+          <div className="space-y-1 sm:space-y-2">
+            <div className="overflow-hidden">
+              <motion.h1
+                initial={{ y: '105%', opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.85, ease: EASE_EDITORIAL }}
+                className="display-hero text-warm-white"
               >
-                <img
-                  src={vDesignLogo}
-                  alt="V DESIGN"
-                  className="h-14 sm:h-16 md:h-20 w-auto object-contain drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)]"
-                />
-              </motion.div>
-
-              {/* Step 2: "CREATIVE DESIGN STUDIO" appears */}
+                WE DESIGN
+              </motion.h1>
+            </div>
+            <div className="overflow-hidden">
               <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.85, ease: EASE_CINEMATIC }}
-                className="mb-6"
+                initial={{ y: '105%', opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.9, delay: 0.15, ease: EASE_EDITORIAL }}
+                className="display-hero text-warm-white flex items-baseline flex-wrap"
               >
-                <p className="text-cream/90 text-xs sm:text-sm font-semibold tracking-[0.35em] uppercase">
-                  CREATIVE DESIGN STUDIO
-                </p>
-              </motion.div>
-
-              {/* Step 3: Thin line draws */}
-              <motion.div
-                initial={{ scaleX: 0, opacity: 0 }}
-                animate={{ scaleX: 1, opacity: 1 }}
-                transition={{ duration: 1.0, delay: 1.25, ease: EASE_CINEMATIC }}
-                className="w-48 sm:w-64 h-[1px] bg-gradient-to-r from-transparent via-gold to-transparent origin-center mb-6"
-              />
-
-              {/* Step 4: Subtle light movement shimmer */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 0.8, 0.3] }}
-                transition={{ duration: 1.2, delay: 1.6, ease: 'easeInOut' }}
-                className="text-[0.6rem] text-ash/60 tracking-[0.3em] uppercase"
-              >
-                IDENTITIES · DIGITAL · MOTION
+                <span>IDENTITIES</span>
+                <span className="text-lime text-glow-lime ml-1">.</span>
               </motion.div>
             </div>
-
-            {/* Subtle skip prompt */}
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.4 }}
-              transition={{ delay: 1.5, duration: 0.5 }}
-              className="absolute bottom-8 text-[0.6rem] text-ash tracking-[0.25em] uppercase"
-            >
-              CLICK TO ENTER
-            </motion.span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ══════════════════════════════════════════════════════
-          BACKGROUND LIGHT & SUBTLE ARCHITECTURAL GRID
-         ══════════════════════════════════════════════════════ */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        {/* Cinematic soft radial light bloom */}
-        <div
-          className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full opacity-40"
-          style={{
-            background:
-              'radial-gradient(circle, rgba(201, 169, 110, 0.08) 0%, rgba(201, 169, 110, 0.02) 40%, transparent 70%)',
-            filter: 'blur(80px)',
-          }}
-        />
-        {/* Subtle architectural vertical grid line */}
-        <div className="max-w-7xl mx-auto h-full px-6 md:px-12 lg:px-16 grid grid-cols-12 opacity-15">
-          <div className="col-span-1 border-r border-ink-border h-full hidden lg:block" />
-          <div className="col-span-10 h-full" />
-          <div className="col-span-1 border-l border-ink-border h-full hidden lg:block" />
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════════
-          TOP BAR ALIGNMENT (Below fixed navigation)
-         ══════════════════════════════════════════════════════ */}
-      <div className="w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-28 md:pt-36">
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.3, ease: EASE_CINEMATIC }}
-          className="flex items-center justify-between border-b border-ink-border/60 pb-4"
-        >
-          <div className="flex items-center gap-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
-            <p className="label-xs text-cream/80 tracking-[0.28em]">
-              V DESIGN — CREATIVE DESIGN STUDIO
-            </p>
-          </div>
-          <p className="label-xs text-ash/60 tracking-[0.25em] hidden sm:block">
-            INDEPENDENT STUDIO / 2024
-          </p>
-        </motion.div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════════
-          MAIN HERO TYPOGRAPHY & GRID
-          Hierarchy:
-          - CREATIVE DESIGN STUDIO
-          - WE DESIGN (Monumental responsive typography)
-          - IDENTITIES.
-          - SUPPORTING TEXT + CTAs
-         ══════════════════════════════════════════════════════ */}
-      <div className="flex-1 flex flex-col justify-center w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-10 md:py-14">
-        {/* Studio badge */}
-        <motion.div
-          initial={{ opacity: 0, x: -16 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.45, ease: EASE_CINEMATIC }}
-          className="mb-6 md:mb-8 flex items-center gap-4"
-        >
-          <span className="h-[1px] w-8 md:w-12 bg-gold/60" />
-          <span className="label-xs text-gold tracking-[0.35em] font-semibold">
-            CREATIVE DESIGN STUDIO
-          </span>
-          <span className="label-xs text-ash/40 tracking-[0.2em] hidden sm:inline">
-            / BRANDING · DIGITAL · MOTION
-          </span>
-        </motion.div>
-
-        {/* Monumental Headline with Mask Reveal */}
-        <div className="overflow-hidden mb-8 md:mb-10">
-          {/* Line 1: WE DESIGN */}
-          <div className="overflow-hidden">
-            <motion.h1
-              initial={{ y: '105%', opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 1.1, delay: 0.6, ease: EASE_CINEMATIC }}
-              className="text-cream font-black tracking-[-0.04em] uppercase leading-[0.88] select-none"
-              style={{ fontSize: 'clamp(3.8rem, 11vw, 11.5rem)' }}
-            >
-              WE DESIGN
-            </motion.h1>
           </div>
 
-          {/* Line 2: IDENTITIES. */}
-          <div className="overflow-hidden mt-1 md:mt-2">
-            <motion.div
-              initial={{ y: '105%', opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 1.1, delay: 0.75, ease: EASE_CINEMATIC }}
-              className="font-black tracking-[-0.04em] uppercase leading-[0.88] select-none"
-              style={{
-                fontSize: 'clamp(3.8rem, 11vw, 11.5rem)',
-                color: '#f0ebe3',
-              }}
-            >
-              <span>IDENTITIES.</span>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Thin cinematic drawn line */}
-        <motion.div
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 1.2, delay: 0.9, ease: EASE_CINEMATIC }}
-          className="w-full h-[1px] bg-gradient-to-r from-ink-border via-ink-border to-ink-border origin-left mb-8 md:mb-10"
-        />
-
-        {/* Supporting Row: Copy + CTAs aligned to professional grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
-          {/* Supporting Text */}
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
+          {/* Supporting copy */}
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.85, delay: 1.05, ease: EASE_CINEMATIC }}
-            className="lg:col-span-7"
+            transition={{ duration: 0.8, delay: 0.35, ease: EASE_EDITORIAL }}
+            className="text-base sm:text-lg md:text-xl font-space font-light text-warm-muted tracking-tight leading-relaxed max-w-lg"
           >
-            <p className="text-ash text-sm md:text-base lg:text-lg leading-relaxed max-w-xl font-normal">
-              Brand identities, digital experiences and motion
-              <br className="hidden sm:block" /> crafted with intention.
-            </p>
-          </motion.div>
+            We build distinctive brands, digital experiences, and cinematic visuals that help businesses stand apart.
+          </motion.p>
 
-          {/* CTAs */}
+          {/* Primary CTA and Secondary Navigation CTA */}
           <motion.div
-            initial={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.85, delay: 1.2, ease: EASE_CINEMATIC }}
-            className="lg:col-span-5 flex flex-wrap gap-4 lg:justify-end"
+            transition={{ duration: 0.8, delay: 0.5, ease: EASE_EDITORIAL }}
+            className="flex flex-wrap items-center gap-4 sm:gap-5 pt-2"
           >
+            {/* Primary CTA: EXPLORE OUR WORK */}
             <button
+              type="button"
+              onClick={scrollToWork}
+              className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-full bg-lime hover:bg-lime-hover text-charcoal-950 font-space text-xs sm:text-sm font-bold tracking-[0.2em] uppercase transition-all duration-300 shadow-[0_0_30px_rgba(212,255,0,0.35)] hover:shadow-[0_0_45px_rgba(212,255,0,0.55)] cursor-pointer"
+              aria-label="Explore the work of V DESIGN"
+            >
+              <span>EXPLORE OUR WORK</span>
+              <ArrowDown
+                size={16}
+                className="text-charcoal-950 transform group-hover:translate-y-1 transition-transform"
+              />
+            </button>
+
+            {/* Secondary CTA: START A PROJECT */}
+            <button
+              type="button"
               onClick={scrollToContact}
-              className="btn-primary"
-              data-cursor="open"
+              className="group inline-flex items-center gap-3 px-7 py-4 rounded-full border border-charcoal-700 hover:border-lime bg-charcoal-900/60 hover:bg-charcoal-900 text-warm-white hover:text-lime font-space text-xs sm:text-sm font-bold tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer"
+              aria-label="Start a project with V DESIGN"
             >
               <span>START A PROJECT</span>
-              <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                <path
-                  d="M2 12L12 2M12 2H5M12 2V9"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-
-            <button
-              onClick={scrollToWork}
-              className="btn-outline"
-              data-cursor="view"
-            >
-              <span>VIEW WORK</span>
-              <span aria-hidden="true" className="text-gold text-xs">↓</span>
+              <ArrowUpRight
+                size={16}
+                className="text-lime transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
+              />
             </button>
           </motion.div>
         </div>
+
+        {/* Right Column: Dynamic Cinematic Showreel Visual Stage */}
+        <div className="lg:col-span-5 relative">
+          <div className="relative rounded-2xl border border-charcoal-700/80 bg-charcoal-900/80 p-4 sm:p-5 backdrop-blur-xl shadow-2xl overflow-hidden group">
+            {/* Showreel Top Bar */}
+            <div className="flex items-center justify-between border-b border-charcoal-800 pb-3 mb-3 text-[0.65rem] font-mono">
+              <div className="flex items-center gap-2 text-warm-white">
+                <Play size={12} className="text-lime fill-lime" />
+                <span className="font-bold tracking-widest">SHOWREEL STAGE</span>
+              </div>
+              <div className="flex items-center gap-2 text-warm-dim">
+                <span className="w-1.5 h-1.5 rounded-full bg-lime animate-ping" />
+                <span className="tracking-wider text-lime">LIVE PREVIEW</span>
+              </div>
+            </div>
+
+            {/* Main Stage Artwork Container */}
+            <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-charcoal-950 flex items-center justify-center border border-charcoal-800/80">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeProject.id}
+                  initial={{ opacity: 0, scale: 0.94 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.04 }}
+                  transition={{ duration: 0.65, ease: EASE_EDITORIAL }}
+                  className="relative w-full h-full flex items-center justify-center p-6"
+                >
+                  <img
+                    src={activeProject.image}
+                    alt={`${activeProject.title} — ${activeProject.category}`}
+                    className="max-h-full max-w-full object-contain filter contrast-[1.03] drop-shadow-2xl transition-transform duration-700 group-hover:scale-105"
+                  />
+
+                  {/* Artwork Tag Badge */}
+                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between p-3 rounded-lg bg-charcoal-950/85 backdrop-blur-md border border-charcoal-800/90 text-left">
+                    <div>
+                      <span className="font-mono text-[0.6rem] text-lime font-bold block">
+                        {activeProject.number} &mdash; {activeProject.category}
+                      </span>
+                      <h4 className="font-display font-bold text-sm sm:text-base text-warm-white uppercase tracking-tight">
+                        {activeProject.title}
+                      </h4>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={scrollToWork}
+                      className="p-2 rounded-md bg-charcoal-800 hover:bg-lime text-warm-white hover:text-charcoal-950 transition-colors"
+                      title="View Project"
+                    >
+                      <ArrowUpRight size={14} />
+                    </button>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Interactive Thumbnail Carousel Ticker (Allows user to click through the 4 projects) */}
+            <div className="grid grid-cols-4 gap-2 pt-3">
+              {projects.map((proj, idx) => {
+                const isCurrent = idx === activeProjectIndex;
+                return (
+                  <button
+                    key={proj.id}
+                    type="button"
+                    onClick={() => {
+                      setActiveProjectIndex(idx);
+                      setIsPlaying(false);
+                    }}
+                    className={`relative rounded-lg overflow-hidden border p-1 text-left transition-all ${
+                      isCurrent
+                        ? 'border-lime bg-lime/10 shadow-[0_0_12px_rgba(212,255,0,0.3)]'
+                        : 'border-charcoal-800 bg-charcoal-950 hover:border-charcoal-700 opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <div className="aspect-square w-full rounded overflow-hidden bg-charcoal-900 flex items-center justify-center mb-1">
+                      <img
+                        src={proj.image}
+                        alt={proj.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <span className="font-mono text-[0.55rem] font-bold block truncate text-warm-white">
+                      {proj.number}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* ══════════════════════════════════════════════════════
-          HERO FOOTER / SCROLL INDICATOR
-         ══════════════════════════════════════════════════════ */}
-      <div className="w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pb-8 md:pb-10">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.9, delay: 1.4 }}
-          className="flex items-center justify-between border-t border-ink-border/40 pt-4"
+      {/* Bottom Scroll Cue */}
+      <div className="relative z-10 max-w-7xl mx-auto w-full pt-4 flex items-center justify-between text-warm-dim font-mono text-[0.62rem]">
+        <div className="flex items-center gap-2 text-lime font-semibold">
+          <Sparkles size={12} />
+          <span>V DESIGN &mdash; INDEPENDENT CREATIVE STUDIO</span>
+        </div>
+        <button
+          type="button"
+          onClick={scrollToWork}
+          className="flex items-center gap-2 text-warm-muted hover:text-lime transition-colors group cursor-pointer"
         >
-          <div className="flex items-center gap-6">
-            <span className="label-xs text-ash/40">01 / OVERVIEW</span>
-            <span className="label-xs text-ash/40 hidden sm:inline">SELECTED PROJECTS AHEAD</span>
-          </div>
-
-          <button
-            onClick={scrollToWork}
-            className="flex items-center gap-3 group focus:outline-none"
-            aria-label="Scroll to work"
-          >
-            <span className="label-xs text-ash/50 group-hover:text-cream transition-colors">
-              SCROLL
-            </span>
-            <motion.div
-              animate={{ y: [0, 6, 0] }}
-              transition={{ duration: 2.0, repeat: Infinity, ease: 'easeInOut' }}
-              className="w-1.5 h-1.5 rounded-full bg-gold"
-            />
-          </button>
-        </motion.div>
+          <span>SCROLL TO EXPLORE</span>
+          <ArrowDown size={12} className="group-hover:translate-y-0.5 transition-transform text-lime" />
+        </button>
       </div>
     </section>
   );

@@ -1,4 +1,4 @@
-// Project data types and real client work for V DESIGN
+// Real client work and creative direction assets for V DESIGN
 import a2Image from '../assets/projects/A2.jpeg';
 import wellfitImage from '../assets/projects/WELLFIT.jpeg';
 import sbgImage from '../assets/projects/SBG.jpeg';
@@ -8,13 +8,15 @@ export interface Project {
   id: string;
   number: string;
   title: string;
-  subtitle: string;
   category: string;
+  client: string;
   year: string;
   image: string;
-  description: string;
-  tags: string[];
-  accentColor: string;
+  summary: string;
+  themeColor: string;
+  glowColor: string;
+  accentBg: string;
+  palette: string[];
 }
 
 export const projects: Project[] = [
@@ -22,52 +24,60 @@ export const projects: Project[] = [
     id: 'a2-return-gift-shop',
     number: '01',
     title: 'A²',
-    subtitle: 'RETURN GIFT SHOP',
-    category: 'Brand Identity',
+    category: 'Return Gift Shop',
+    client: 'A² Return Gift Shop',
     year: '2024',
     image: a2Image,
-    description:
-      'Complete brand identity for A², an elegant return gift shop. Crown emblem, flowing banner typography, and celebratory color palette designed to make every gift and celebration unforgettable.',
-    tags: ['Logo Design', 'Brand Identity', 'Visual System', 'Packaging'],
-    accentColor: '#c9a96e',
+    summary:
+      'Complete brand identity system for an upscale return gift boutique. Built around a sovereign crown emblem, bespoke serif letterforms, and celebratory packaging architecture.',
+    themeColor: '#e5b869',
+    glowColor: 'rgba(229, 184, 105, 0.25)',
+    accentBg: '#12100b',
+    palette: ['#c9a96e', '#f5f0e6', '#e5b869', '#141416'],
   },
   {
     id: 'wellfit-mua',
     number: '02',
     title: 'WELLFIT',
-    subtitle: 'MUA ARTIST',
-    category: 'Brand Identity',
+    category: 'MUA Artist',
+    client: 'WELLFIT — MUA Artist',
     year: '2024',
     image: wellfitImage,
-    description:
-      'Luxury beauty and makeup artistry identity for WELLFIT. Rose gold framed aesthetics, delicate line illustration, and refined editorial typography capturing elegance and glam.',
-    tags: ['Logo Design', 'Brand Identity', 'Beauty & Luxury', 'Editorial'],
-    accentColor: '#d4a0b0',
+    summary:
+      'A refined editorial identity for high-fashion bridal and editorial makeup artist WELLFIT. Pairing delicate single-line silhouette art direction with timeless serif typography.',
+    themeColor: '#d8a48f',
+    glowColor: 'rgba(216, 164, 143, 0.25)',
+    accentBg: '#140f11',
+    palette: ['#d8a48f', '#f9ede7', '#1a1819', '#967060'],
   },
   {
     id: 'sbg-homemade-brownies',
     number: '03',
     title: 'SBG',
-    subtitle: 'HOMEMADE BROWNIES',
-    category: 'Brand Identity',
+    category: 'Homemade Brownies',
+    client: 'SBG Homemade Brownies',
     year: '2024',
     image: sbgImage,
-    description:
-      'Artisan bakery brand identity for SBG Homemade Brownies. Warm, handcrafted character featuring chocolate cookie typography, chef toque icon, and packaging emblem crafted with love.',
-    tags: ['Logo Design', 'Brand Identity', 'Packaging Identity', 'Artisan'],
-    accentColor: '#b87333',
+    summary:
+      'Distinctive artisanal identity for small-batch gourmet bakery SBG. Custom chocolate-embossed typography, chef-toque seal emblem, and warm packaging systems.',
+    themeColor: '#c27d42',
+    glowColor: 'rgba(194, 125, 66, 0.25)',
+    accentBg: '#150f0b',
+    palette: ['#b87333', '#fdf6ed', '#261811', '#c27d42'],
   },
   {
     id: 'krishika-shree-travels',
     number: '04',
     title: 'KRISHIKA SHREE TRAVELS',
-    subtitle: 'JOURNEY BEYOND DESTINATIONS',
-    category: 'Brand Identity',
+    category: 'Travel Brand',
+    client: 'Krishika Shree Travels',
     year: '2024',
     image: ksImage,
-    description:
-      'Dynamic travel identity for Krishika Shree Travels. Aerodynamic monogram, open roadway, scenic coastlines and bold dual-tone palette representing seamless exploration.',
-    tags: ['Logo Design', 'Brand Identity', 'Visual Identity', 'Travel & Tour'],
-    accentColor: '#2575fc',
+    summary:
+      'Aerodynamic mobility identity for premium tour and fleet operator Krishika Shree Travels. Features a fluid dual-ribbon road monogram and open-horizon geometry.',
+    themeColor: '#0ea5e9',
+    glowColor: 'rgba(14, 165, 233, 0.25)',
+    accentBg: '#08111a',
+    palette: ['#2563eb', '#38bdf8', '#0ea5e9', '#0b1120'],
   },
 ];

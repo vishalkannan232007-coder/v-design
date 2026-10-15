@@ -3,8 +3,27 @@
 @tailwind utilities;
 
 /* ============================================
-   GLOBAL BASE STYLES
+   GLOBAL BASE & COLOR VARIABLES
    ============================================ */
+:root {
+  --bg-deep: #08080a;
+  --bg-surface: #0e0e12;
+  --bg-card: #141418;
+  --border-subtle: #1e1e24;
+  --border-strong: #2a2a34;
+  --text-primary: #f5f5f3;
+  --text-muted: #96969e;
+  --text-dim: #606068;
+  --accent-lime: #d4ff00;
+  --accent-lime-muted: #a6cc00;
+  --accent-lime-subtle: rgba(212, 255, 0, 0.08);
+  /* Cinematic amber warm palette */
+  --amber-glow: rgba(194, 100, 28, 0.18);
+  --amber-mid:  rgba(210, 90, 20, 0.10);
+  --amber-faint: rgba(220, 110, 30, 0.06);
+  --ember-warm: rgba(240, 120, 40, 0.14);
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -12,11 +31,13 @@
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
 }
 
 body {
-  background-color: #0a0a0a;
-  color: #f0ebe3;
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
   font-family: 'Outfit', sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -24,186 +45,240 @@ body {
 }
 
 /* ============================================
-   CUSTOM CURSOR
+   ACCESSIBILITY & FOCUS VISIBLE
    ============================================ */
-@media (pointer: fine) {
-  * { cursor: none; }
+:focus-visible {
+  outline: 2px solid var(--accent-lime);
+  outline-offset: 3px;
 }
 
 /* ============================================
-   TYPOGRAPHY UTILITIES
+   TEXT SELECTION
    ============================================ */
-.display-xl {
-  font-size: clamp(3rem, 9vw, 9.5rem);
-  font-weight: 800;
-  line-height: 0.9;
-  letter-spacing: -0.04em;
-}
-
-.display-lg {
-  font-size: clamp(2.2rem, 6.5vw, 7rem);
-  font-weight: 800;
-  line-height: 0.9;
-  letter-spacing: -0.03em;
-}
-
-.display-md {
-  font-size: clamp(1.8rem, 4.5vw, 5rem);
-  font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: -0.02em;
-}
-
-.display-sm {
-  font-size: clamp(1.4rem, 3vw, 3.5rem);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-
-.label-sm {
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: #888888;
-}
-
-.label-xs {
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: #888888;
-}
-
-/* Hero accent line — second line of hero heading */
-.hero-line-accent {
-  -webkit-text-stroke: 1px #c9a96e;
-  color: transparent;
-}
-
-@media (max-width: 640px) {
-  .hero-line-accent {
-    -webkit-text-stroke: 0.5px #c9a96e;
-    color: transparent;
-  }
+::selection {
+  background-color: var(--accent-lime);
+  color: #08080a;
 }
 
 /* ============================================
-   SCROLLBAR
+   CUSTOM SCROLLBAR
    ============================================ */
 ::-webkit-scrollbar {
-  width: 1px;
+  width: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: #08080a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2a2a2a;
+  background: #23232c;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-lime);
 }
 
 /* ============================================
-   SELECTION
+   CINEMATIC EMBER & ATMOSPHERIC ANIMATIONS
    ============================================ */
-::selection {
-  background: #c9a96e;
-  color: #0a0a0a;
+
+/* Floating ember particle */
+@keyframes ember-float {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0;
+  }
+  15% { opacity: 0.7; }
+  60% { opacity: 0.4; }
+  85% {
+    transform: translateY(-60vh) translateX(40px) scale(0.5);
+    opacity: 0.2;
+  }
+  100% {
+    transform: translateY(-80vh) translateX(-10px) scale(0.2);
+    opacity: 0;
+  }
 }
 
-/* ============================================
-   SECTION DIVIDER
-   ============================================ */
-.section-divider {
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(to right, transparent, #222222 20%, #222222 80%, transparent);
+/* Slow ambient breathe */
+@keyframes ambient-breathe {
+  0%, 100% { opacity: 0.06; }
+  50% { opacity: 0.11; }
 }
 
-/* ============================================
-   GRADIENT TEXT
-   ============================================ */
-.text-gradient {
-  background: linear-gradient(135deg, #f0ebe3 0%, #c9a96e 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Subtle horizontal scan */
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
 }
 
-/* ============================================
-   MARQUEE
-   ============================================ */
-.marquee-track {
-  display: flex;
-  gap: 0;
-  white-space: nowrap;
+/* Gentle warmth pulse on elements */
+@keyframes warmth-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(194, 100, 28, 0.12); }
+  50%       { box-shadow: 0 0 40px rgba(194, 100, 28, 0.22); }
 }
 
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
-.marquee-animate {
-  animation: marquee 28s linear infinite;
-}
-
-/* ============================================
-   NOISE TEXTURE OVERLAY
-   ============================================ */
-.noise::after {
-  content: '';
+/* CSS ember particles — lightweight, no JS needed */
+.ember-container {
   position: absolute;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
   pointer-events: none;
-  z-index: 1;
+  overflow: hidden;
+  z-index: 0;
 }
 
+.ember {
+  position: absolute;
+  border-radius: 50%;
+  animation: ember-float linear infinite;
+  will-change: transform, opacity;
+}
+
+.ember-1 {
+  width: 3px; height: 3px;
+  background: rgba(220, 120, 40, 0.55);
+  bottom: 5%; left: 12%;
+  animation-duration: 9s;
+  animation-delay: 0s;
+}
+.ember-2 {
+  width: 2px; height: 2px;
+  background: rgba(240, 150, 60, 0.45);
+  bottom: 8%; left: 35%;
+  animation-duration: 12s;
+  animation-delay: 2.5s;
+}
+.ember-3 {
+  width: 4px; height: 4px;
+  background: rgba(210, 100, 30, 0.4);
+  bottom: 2%; left: 60%;
+  animation-duration: 10s;
+  animation-delay: 4s;
+}
+.ember-4 {
+  width: 2px; height: 2px;
+  background: rgba(250, 170, 70, 0.5);
+  bottom: 10%; left: 78%;
+  animation-duration: 8s;
+  animation-delay: 1.5s;
+}
+.ember-5 {
+  width: 3px; height: 3px;
+  background: rgba(220, 120, 40, 0.35);
+  bottom: 4%; left: 48%;
+  animation-duration: 14s;
+  animation-delay: 6s;
+}
+
+/* Warm glow utility */
+.warm-glow {
+  animation: warmth-pulse 4s ease-in-out infinite;
+}
+
+/* Cinematic hero atmosphere overlay */
+.hero-cinematic-bg {
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(180,70,15,0.12) 0%, transparent 65%),
+    radial-gradient(ellipse 30% 25% at 0% 50%,  rgba(210,90,20,0.07)  0%, transparent 60%),
+    radial-gradient(ellipse 25% 20% at 100% 30%, rgba(200,85,25,0.05)  0%, transparent 55%);
+  animation: ambient-breathe 8s ease-in-out infinite;
+}
+
+
 /* ============================================
-   PROJECT CARD HOVER
+   EDITORIAL TYPOGRAPHY UTILITIES
    ============================================ */
-.project-card {
-  position: relative;
+.display-hero {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(3.2rem, 10.5vw, 11.5rem);
+  font-weight: 800;
+  line-height: 0.86;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
 }
 
-.project-card .card-image {
-  transition: transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+.display-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.4rem, 6.8vw, 6.8rem);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
 }
 
-.project-card:hover .card-image {
-  transform: scale(1.05);
+.display-section {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.8rem, 4.5vw, 4.5rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
 }
 
-.project-card .card-overlay {
-  opacity: 0;
-  transition: opacity 0.4s ease;
+.label-mono {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-dim);
 }
 
-.project-card:hover .card-overlay {
-  opacity: 1;
+.label-lime {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent-lime);
+}
+
+.text-glow-lime {
+  text-shadow: 0 0 20px rgba(212, 255, 0, 0.45);
+}
+
+.box-glow-lime {
+  box-shadow: 0 0 30px rgba(212, 255, 0, 0.2);
 }
 
 /* ============================================
-   BUTTON STYLES
+   ARCHITECTURAL GRID & BORDERS
+   ============================================ */
+.border-grid {
+  border-color: var(--border-subtle);
+}
+
+.bg-charcoal-canvas {
+  background-color: var(--bg-deep);
+}
+
+.bg-charcoal-panel {
+  background-color: var(--bg-surface);
+}
+
+.bg-charcoal-card {
+  background-color: var(--bg-card);
+}
+
+/* ============================================
+   BUTTONS & CTAs
    ============================================ */
 .btn-primary {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.875rem 2rem;
-  background: #f0ebe3;
-  color: #0a0a0a;
-  font-size: 0.65rem;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.9rem 2.2rem;
+  background-color: var(--text-primary);
+  color: #08080a;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  border: none;
-  transition: all 0.3s ease;
+  border: 1px solid var(--text-primary);
   position: relative;
   overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
 }
 
@@ -211,125 +286,90 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: #c9a96e;
-  transform: translateX(-100%);
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background-color: var(--accent-lime);
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 0;
 }
 
 .btn-primary:hover::before {
-  transform: translateX(0);
+  transform: translateY(0);
 }
 
 .btn-primary span,
 .btn-primary svg {
   position: relative;
   z-index: 1;
+  transition: color 0.3s ease;
+}
+
+.btn-primary:hover {
+  border-color: var(--accent-lime);
+  color: #08080a;
 }
 
 .btn-outline {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.875rem 2rem;
-  background: transparent;
-  color: #f0ebe3;
-  font-size: 0.65rem;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.9rem 2.2rem;
+  background-color: transparent;
+  color: var(--text-primary);
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  border: 1px solid #333;
-  transition: all 0.3s ease;
+  border: 1px solid var(--border-strong);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
 }
 
 .btn-outline:hover {
-  border-color: #f0ebe3;
-  background: rgba(240, 235, 227, 0.04);
+  border-color: var(--accent-lime);
+  color: var(--accent-lime);
+  background-color: var(--accent-lime-subtle);
 }
 
 /* ============================================
-   FORM STYLES
+   FORM INPUT STYLING
    ============================================ */
-.form-input {
+.form-input-editorial {
   width: 100%;
   background: transparent;
   border: none;
-  border-bottom: 1px solid #2a2a2a;
-  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-strong);
+  padding: 1.1rem 0;
   font-family: 'Outfit', sans-serif;
   font-size: 0.95rem;
-  color: #f0ebe3;
-  transition: border-color 0.3s ease;
+  color: var(--text-primary);
+  transition: border-color 0.25s ease;
   outline: none;
-  -webkit-appearance: none;
-  appearance: none;
+  border-radius: 0;
 }
 
-.form-input::placeholder {
-  color: #444;
+.form-input-editorial::placeholder {
+  color: var(--text-dim);
   font-size: 0.8rem;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.form-input:focus {
-  border-bottom-color: #c9a96e;
+.form-input-editorial:focus {
+  border-bottom-color: var(--accent-lime);
 }
 
-select.form-input {
+select.form-input-editorial {
   cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23606068' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0 center;
   padding-right: 1.5rem;
 }
 
-select.form-input option {
-  background: #111;
-  color: #f0ebe3;
-}
-
-/* ============================================
-   NAVIGATION
-   ============================================ */
-.nav-link {
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: #777;
-  transition: color 0.3s ease;
-  position: relative;
-}
-
-.nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: #c9a96e;
-  transition: width 0.3s ease;
-}
-
-.nav-link:hover {
-  color: #f0ebe3;
-}
-
-.nav-link:hover::after {
-  width: 100%;
-}
-
-/* ============================================
-   RESPONSIVE OVERFLOW FIX
-   ============================================ */
-main {
-  overflow-x: hidden;
-}
-
-section {
-  overflow-x: hidden;
+select.form-input-editorial option {
+  background: #111116;
+  color: var(--text-primary);
 }
 
 /* ============================================
