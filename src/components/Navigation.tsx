@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
-import vDesignLogo from '../assets/brand/V-DESIGN-LOGO.png';
+import vDesignLogo from '../assets/brand/V-DESIGN-LOGO-transparent.png';
 
 const navItems = [
   { href: '#opening', label: 'OPENING', chapter: '01' },
   { href: '#work', label: 'THE WORK', chapter: '02' },
-  { href: '#services', label: 'WHAT WE DO', chapter: '03' },
+  { href: '#services', label: 'SERVICES', chapter: '03' },
   { href: '#studio', label: 'THE STUDIO', chapter: '04' },
   { href: '#contact', label: "LET'S START", chapter: '05' },
 ];
 
-export function Navigation() {
+export function Navigation({ revealed = true }: { revealed?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('opening');
@@ -60,9 +60,12 @@ export function Navigation() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        aria-hidden={revealed ? undefined : true}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          revealed ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-3 opacity-0'
+        } ${
           scrolled
-            ? 'bg-charcoal-950/90 backdrop-blur-xl border-b border-charcoal-800/80 py-3.5 shadow-[0_4px_30px_rgba(0,0,0,0.6)]'
+            ? 'glass-nav py-3.5 shadow-[0_4px_30px_rgba(0,0,0,0.6)]'
             : 'bg-transparent py-5 md:py-7'
         }`}
       >
@@ -80,14 +83,14 @@ export function Navigation() {
             <img
               src={vDesignLogo}
               alt="V DESIGN"
-              className="h-7 sm:h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              className="h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
             />
           </a>
 
           {/* Desktop 5-Chapter Navigation Links */}
           <nav
             aria-label="Chapter Navigation"
-            className="hidden md:flex items-center gap-6 lg:gap-8 px-4 py-1.5 rounded-full border border-charcoal-800/80 bg-charcoal-900/60 backdrop-blur-md"
+            className="hidden md:flex items-center gap-6 lg:gap-8 px-5 py-2 rounded-full glass-pill shadow-lg"
           >
             {navItems.map((item) => {
               const isActive = activeSection === item.href.replace('#', '');
@@ -125,12 +128,12 @@ export function Navigation() {
                 e.preventDefault();
                 scrollTo('#contact');
               }}
-              className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-lime/40 bg-charcoal-900/80 hover:bg-lime hover:border-lime text-warm-white hover:text-charcoal-950 font-space text-[0.68rem] font-bold tracking-[0.18em] uppercase transition-all duration-300 shadow-[0_0_15px_rgba(212,255,0,0.1)] hover:shadow-[0_0_25px_rgba(212,255,0,0.4)]"
+              className="pill-btn-lime group cursor-pointer !py-2.5 !px-5 text-[0.7rem]"
             >
               <span>START A PROJECT</span>
               <ArrowUpRight
-                size={13}
-                className="text-lime group-hover:text-charcoal-950 transition-colors transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                size={14}
+                className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
               />
             </a>
           </div>
@@ -170,7 +173,7 @@ export function Navigation() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-40 bg-charcoal-950/98 backdrop-blur-2xl flex flex-col justify-between pt-28 pb-12 px-6 sm:px-10 md:hidden"
+            className="fixed inset-0 z-40 bg-charcoal-950/95 backdrop-blur-2xl flex flex-col justify-between pt-28 pb-12 px-6 sm:px-10 md:hidden"
           >
             <div className="space-y-4">
               <p className="font-mono text-warm-dim text-xs tracking-[0.3em] uppercase mb-2">

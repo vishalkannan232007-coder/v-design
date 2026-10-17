@@ -6,16 +6,20 @@ import { ArrowUpRight, MessageCircle, Mail, CheckCircle2, AlertCircle, Loader2 }
 const SCRIPT_URL =
   'https://script.google.com/macros/s/AKfycby3kZXjZ1pXjb45FNy0u1FlQJIvlYEvNOkj69PUfFi1geUiIZKykqXuO05J6vz0cqYB/exec';
 
-const EMAIL = 'vishalkannan232007@gmail.com';
+const EMAIL = 'vdesignworks028@gmail.com';
 const WHATSAPP = '+91 95850 57340';
 const WHATSAPP_URL = `https://wa.me/919585057340?text=Hi%20V%20DESIGN%2C%20I%20have%20a%20project%20in%20mind.`;
 
 const serviceOptions = [
-  'BRAND IDENTITY',
-  'WEBSITE & UI/UX',
-  'CINEMATIC VIDEO',
-  'MOTION GRAPHICS',
-  'COMPREHENSIVE PARTNERSHIP',
+  'Logo Design',
+  'Brand Identity',
+  'Video Editing',
+  'Cinematic Reels',
+  'Social Media Creatives',
+  'Website Design',
+  'UI/UX Design',
+  'Motion Graphics',
+  'Comprehensive Partnership',
 ];
 
 interface ContactFormData {
@@ -139,21 +143,41 @@ export function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-24 sm:py-32 md:py-40 px-6 md:px-12 lg:px-16 bg-charcoal-950 border-b border-charcoal-800 relative">
-      <div className="max-w-7xl mx-auto space-y-16 sm:space-y-20">
+    <section id="contact" className="py-20 sm:py-28 md:py-36 px-4 sm:px-8 md:px-12 lg:px-16 bg-charcoal-950 border-b border-charcoal-800 relative overflow-hidden">
+      {/* Ambient background glow for the showcase panel */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-16 -translate-x-1/2 w-full max-w-6xl h-96 opacity-35 blur-[110px]"
+        style={{
+          background:
+            'radial-gradient(ellipse 65% 50% at 50% 30%, rgba(200,245,47,0.2) 0%, rgba(133,139,66,0.12) 45%, transparent 75%)',
+        }}
+        aria-hidden="true"
+      />
+
+      <div className="relative mx-auto max-w-7xl showcase-panel p-6 sm:p-10 md:p-12 lg:p-14 space-y-12 sm:space-y-16">
+        {/* Subtle interior glow */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-64 opacity-25"
+          style={{
+            background:
+              'radial-gradient(ellipse 70% 60% at 50% 0%, rgba(200,245,47,0.22) 0%, transparent 70%)',
+          }}
+          aria-hidden="true"
+        />
+
         {/* Chapter 05 Section Header */}
-        <div className="space-y-4 border-b border-charcoal-800 pb-10">
+        <div className="space-y-4 border-b border-charcoal-800/80 pb-10 relative z-10">
           <div className="flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-lime shadow-[0_0_8px_rgba(212,255,0,0.8)] animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-lime shadow-[0_0_8px_rgba(200,245,47,0.8)] animate-pulse" />
             <p className="font-mono text-lime font-bold text-xs tracking-[0.25em] uppercase">
-              CHAPTER 05 &mdash; LET'S START
+              CHAPTER 05 &mdash; LET&apos;S START
             </p>
           </div>
 
           {/* Exact Headline Required */}
           <div className="space-y-1">
             <h2 className="display-hero text-warm-white">
-              LET'S MAKE
+              LET&apos;S MAKE
             </h2>
             <div className="display-hero text-warm-white flex items-baseline flex-wrap">
               <span>SOMETHING DISTINCTIVE</span>
@@ -163,7 +187,7 @@ export function ContactSection() {
         </div>
 
         {/* Contact Grid: Form & Direct Studio Channels */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 relative z-10">
           {/* Main Inquiry Form */}
           <div className="lg:col-span-7">
             <form onSubmit={handleSubmit} noValidate className="space-y-6">
@@ -323,7 +347,7 @@ export function ContactSection() {
                 <button
                   type="submit"
                   disabled={status === 'loading'}
-                  className={`inline-flex items-center gap-3.5 px-8 py-4 rounded-full bg-lime hover:bg-lime-hover text-charcoal-950 font-space text-xs sm:text-sm font-bold tracking-[0.2em] uppercase transition-all duration-300 shadow-[0_0_25px_rgba(212,255,0,0.35)] cursor-pointer ${
+                  className={`pill-btn-lime !py-4 !px-8 text-xs sm:text-sm font-bold tracking-[0.2em] cursor-pointer ${
                     status === 'loading' ? 'opacity-70 cursor-not-allowed' : ''
                   }`}
                   aria-label="Start a Project"

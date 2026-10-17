@@ -6,22 +6,33 @@
    GLOBAL BASE & COLOR VARIABLES
    ============================================ */
 :root {
-  --bg-deep: #08080a;
-  --bg-surface: #0e0e12;
-  --bg-card: #141418;
-  --border-subtle: #1e1e24;
-  --border-strong: #2a2a34;
-  --text-primary: #f5f5f3;
-  --text-muted: #96969e;
-  --text-dim: #606068;
-  --accent-lime: #d4ff00;
-  --accent-lime-muted: #a6cc00;
-  --accent-lime-subtle: rgba(212, 255, 0, 0.08);
-  /* Cinematic amber warm palette */
-  --amber-glow: rgba(194, 100, 28, 0.18);
-  --amber-mid:  rgba(210, 90, 20, 0.10);
-  --amber-faint: rgba(220, 110, 30, 0.06);
-  --ember-warm: rgba(240, 120, 40, 0.14);
+  --bg-deep: #090B09;
+  --bg-surface: #141712;
+  --bg-card: #191E16;
+  --bg-card-elevated: #20271D;
+  --border-subtle: rgba(243, 240, 232, 0.08);
+  --border-strong: rgba(243, 240, 232, 0.16);
+  --border-warm: rgba(243, 240, 232, 0.12);
+  --text-primary: #F3F0E8;
+  --text-muted: #A3A096;
+  --text-dim: #6E6B63;
+  --accent-lime: #C8F52F;
+  --accent-lime-hover: #D6FB4C;
+  --accent-lime-muted: #858B42;
+  --accent-lime-subtle: rgba(200, 245, 47, 0.12);
+  --accent-lime-glow: rgba(200, 245, 47, 0.35);
+  --accent-olive: #858B42;
+  --accent-olive-subtle: rgba(133, 139, 66, 0.15);
+  --accent-solar: #d97757;
+  --accent-solar-hover: #ea8b65;
+  --accent-solar-amber: #f59e0b;
+  --accent-solar-subtle: rgba(217, 119, 87, 0.08);
+  --accent-solar-glow: rgba(217, 119, 87, 0.16);
+  --warm-ivory: #F3F0E8;
+  /* Ambient glow colors */
+  --glow-lime: rgba(200, 245, 47, 0.22);
+  --glow-olive: rgba(133, 139, 66, 0.20);
+  --glow-solar: rgba(217, 119, 87, 0.18);
 }
 
 *, *::before, *::after {
@@ -38,7 +49,7 @@ html {
 body {
   background-color: var(--bg-deep);
   color: var(--text-primary);
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -57,7 +68,7 @@ body {
    ============================================ */
 ::selection {
   background-color: var(--accent-lime);
-  color: #08080a;
+  color: #090B09;
 }
 
 /* ============================================
@@ -68,11 +79,11 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #08080a;
+  background: #090B09;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #23232c;
+  background: #232920;
   border-radius: 2px;
 }
 
@@ -191,54 +202,59 @@ body {
    EDITORIAL TYPOGRAPHY UTILITIES
    ============================================ */
 .display-hero {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(3.2rem, 10.5vw, 11.5rem);
-  font-weight: 800;
-  line-height: 0.86;
-  letter-spacing: -0.045em;
+  font-family: 'Space Grotesk', 'Manrope', sans-serif;
+  font-size: clamp(2.6rem, 6.8vw, 6.2rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
 }
 
 .display-title {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(2.4rem, 6.8vw, 6.8rem);
-  font-weight: 800;
-  line-height: 0.9;
-  letter-spacing: -0.04em;
+  font-family: 'Space Grotesk', 'Manrope', sans-serif;
+  font-size: clamp(2.1rem, 5.2vw, 4.6rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
   text-transform: uppercase;
 }
 
 .display-section {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(1.8rem, 4.5vw, 4.5rem);
-  font-weight: 800;
-  line-height: 0.95;
-  letter-spacing: -0.035em;
+  font-family: 'Space Grotesk', 'Manrope', sans-serif;
+  font-size: clamp(1.75rem, 3.8vw, 3.6rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
   text-transform: uppercase;
 }
 
 .label-mono {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.24em;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--text-dim);
 }
 
-.label-lime {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.28em;
+.label-lime,
+.label-solar {
+  font-family: 'Space Grotesk', ui-monospace, monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--accent-lime);
+  color: var(--accent-solar);
 }
 
+.text-glow-solar,
 .text-glow-lime {
-  text-shadow: 0 0 20px rgba(212, 255, 0, 0.45);
+  text-shadow: 0 0 24px rgba(255, 119, 0, 0.45);
 }
 
+.box-glow-solar,
 .box-glow-lime {
-  box-shadow: 0 0 30px rgba(212, 255, 0, 0.2);
+  box-shadow: 0 0 30px rgba(255, 119, 0, 0.2);
 }
 
 /* ============================================
@@ -370,6 +386,260 @@ select.form-input-editorial {
 select.form-input-editorial option {
   background: #111116;
   color: var(--text-primary);
+}
+
+/* ============================================
+   PHASE 1 — CINEMATIC FOUNDATION
+   ============================================ */
+
+/* Editorial display scale used by the cinematic hero */
+.display-cinematic {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(2.4rem, 6.2vw, 5.6rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+/* Film grain — adds cinematic texture with negligible cost */
+.film-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  opacity: 0.045;
+  mix-blend-mode: overlay;
+  animation: grain-shift 1.4s steps(6) infinite;
+}
+
+@keyframes grain-shift {
+  0%   { background-position: 0 0; }
+  20%  { background-position: -14px 9px; }
+  40%  { background-position: 11px -16px; }
+  60%  { background-position: -8px 13px; }
+  80%  { background-position: 16px -7px; }
+  100% { background-position: 0 0; }
+}
+
+/* Hero scroll indicator — a single travelling light line */
+@keyframes scroll-line {
+  0%   { transform: scaleY(0); transform-origin: top; opacity: 0; }
+  30%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
+  55%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
+  100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+}
+
+.scroll-line {
+  animation: scroll-line 2.4s cubic-bezier(0.76, 0, 0.24, 1) infinite;
+}
+
+/* ============================================
+   PHASE 2 — THE WORK
+   ============================================ */
+
+/* Horizontal showcase track: hide the native scrollbar (prev/next,
+   position markers and edge peeks carry the affordance instead) */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================
+   PHASE 3 — REFINED GLASSMORPHISM
+   ============================================ */
+.glass-surface {
+  background-color: rgba(14, 14, 18, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-nav {
+  background-color: rgba(6, 6, 8, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.glass-pill {
+  background-color: rgba(20, 20, 26, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+/* Fallback for environments without backdrop-filter support */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-surface {
+    background-color: #0e0e13;
+  }
+  .glass-nav {
+    background-color: #060608;
+  }
+  .glass-pill {
+    background-color: #141418;
+  }
+}
+
+/* ============================================
+   SHOWCASE PANELS & LAYERED SURFACES (REFERENCE 2)
+   ============================================ */
+.showcase-panel {
+  position: relative;
+  background-color: #141712;
+  border-radius: 28px;
+  border: 1px solid rgba(243, 240, 232, 0.1);
+  box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  overflow: hidden;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+@media (min-width: 640px) {
+  .showcase-panel {
+    border-radius: 36px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .showcase-panel {
+    border-radius: 44px;
+  }
+}
+
+.showcase-panel-glow {
+  position: relative;
+}
+
+.showcase-panel-glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: radial-gradient(ellipse 65% 55% at 50% 0%, rgba(200, 245, 47, 0.18), rgba(133, 139, 66, 0.08) 50%, transparent 75%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.showcase-card {
+  background-color: #191E16;
+  border: 1px solid rgba(243, 240, 232, 0.08);
+  border-radius: 20px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.showcase-card:hover {
+  border-color: rgba(200, 245, 47, 0.28);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.5), 0 0 24px rgba(200, 245, 47, 0.08);
+}
+
+/* Pill buttons */
+.pill-btn-lime {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.6rem;
+  border-radius: 9999px;
+  background-color: #C8F52F;
+  color: #090B09;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 24px rgba(200, 245, 47, 0.25);
+}
+
+.pill-btn-lime:hover {
+  background-color: #D6FB4C;
+  box-shadow: 0 0 36px rgba(200, 245, 47, 0.45);
+  transform: translateY(-1px);
+}
+
+.pill-btn-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.6rem;
+  border-radius: 9999px;
+  background-color: rgba(20, 23, 18, 0.8);
+  border: 1px solid rgba(243, 240, 232, 0.14);
+  color: #F3F0E8;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pill-btn-dark:hover {
+  border-color: #C8F52F;
+  color: #C8F52F;
+  background-color: rgba(200, 245, 47, 0.08);
+  transform: translateY(-1px);
+}
+
+/* ============================================
+   FLUID SHADER / TEXTURED GRADIENTS (REFERENCE 3)
+   ============================================ */
+.fluid-shader-panel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  background-color: #090B09;
+  border: 1px solid rgba(243, 240, 232, 0.12);
+}
+
+@media (min-width: 640px) {
+  .fluid-shader-panel {
+    border-radius: 36px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .fluid-shader-panel {
+    border-radius: 44px;
+  }
+}
+
+.fluid-mesh-bg {
+  position: absolute;
+  inset: -15%;
+  width: 130%;
+  height: 130%;
+  background: 
+    radial-gradient(ellipse 60% 50% at 20% 30%, rgba(243, 240, 232, 0.45) 0%, transparent 60%),
+    radial-gradient(ellipse 65% 65% at 75% 45%, rgba(200, 245, 47, 0.40) 0%, transparent 65%),
+    radial-gradient(ellipse 70% 65% at 45% 75%, rgba(133, 139, 66, 0.45) 0%, transparent 70%),
+    radial-gradient(ellipse 55% 45% at 85% 15%, rgba(162, 169, 85, 0.35) 0%, transparent 60%),
+    #141712;
+  filter: blur(65px);
+  opacity: 0.95;
+  animation: fluid-slow-drift 22s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes fluid-slow-drift {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translate(3%, -3%) scale(1.05) rotate(2deg);
+  }
+  66% {
+    transform: translate(-3%, 3%) scale(0.98) rotate(-2deg);
+  }
+  100% {
+    transform: translate(2%, 4%) scale(1.03) rotate(1deg);
+  }
 }
 
 /* ============================================

@@ -7,33 +7,49 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Outfit', 'sans-serif'],
-        display: ['Syne', 'Outfit', 'sans-serif'],
-        space: ['"Space Grotesk"', 'Outfit', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+        sans: ['Manrope', 'system-ui', 'sans-serif'],
+        display: ['"Space Grotesk"', 'sans-serif'],
+        space: ['"Space Grotesk"', 'sans-serif'],
+        mono: ['"Space Grotesk"', 'ui-monospace', 'monospace'],
       },
       colors: {
         charcoal: {
-          950: '#060608',
-          900: '#0b0b0f',
-          850: '#111116',
-          800: '#171720',
-          700: '#22222d',
-          600: '#30303e',
-          500: '#444456',
+          950: '#090B09', // Deep charcoal
+          900: '#141712', // Elevated charcoal
+          850: '#191E16',
+          800: '#232920',
+          700: '#343B30',
+          600: '#4D5647',
+          500: '#6B7564',
+        },
+        olive: {
+          DEFAULT: '#858B42', // Muted olive
+          light: '#9EA550',
+          dark: '#5E622F',
+          subtle: 'rgba(133, 139, 66, 0.12)',
+          glow: 'rgba(133, 139, 66, 0.25)',
         },
         lime: {
-          DEFAULT: '#d4ff00',
-          hover: '#e0ff33',
-          muted: '#a8cc00',
-          subtle: 'rgba(212, 255, 0, 0.08)',
-          glow: 'rgba(212, 255, 0, 0.25)',
+          DEFAULT: '#C8F52F', // Refined lime
+          hover: '#D6FB4C',
+          muted: '#858B42',
+          subtle: 'rgba(200, 245, 47, 0.12)',
+          glow: 'rgba(200, 245, 47, 0.35)',
+        },
+        solar: {
+          DEFAULT: '#d97757',
+          hover: '#ea8b65',
+          amber: '#f59e0b',
+          core: '#fff4cc',
+          subtle: 'rgba(217, 119, 87, 0.08)',
+          glow: 'rgba(217, 119, 87, 0.16)',
         },
         warm: {
-          white: '#fbfbfa',
-          cream: '#eae8e1',
-          muted: '#9a9a9f',
-          dim: '#606068',
+          ivory: '#F3F0E8',
+          white: '#F3F0E8',
+          cream: '#E8E4D8',
+          muted: '#A3A096',
+          dim: '#6E6B63',
         },
       },
       letterSpacing: {

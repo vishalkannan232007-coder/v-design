@@ -1,532 +1,561 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Maximize2, X, ArrowUpRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pause, Play, X, ArrowUpRight, Eye } from 'lucide-react';
 import { projects, type Project } from '../data/projects';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 
-const EASE_EDITORIAL: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const AUTOPLAY_MS = 5000;
+const DISCIPLINE = 'Brand Identity / Logo Design';
 
 export function WorkSection() {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const reduce = usePrefersReducedMotion();
 
-  const scrollToContact = (serviceCategory?: string) => {
-    const contactSection = document.querySelector('#contact');
-    if (contactSection) {
-      contactSection.scrollIntoView({ behavior: 'smooth' });
-    }
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [userPaused, setUserPaused] = useState(false);
+  const [inView, setInView] = useState(true);
+  const [hovering, setHovering] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [announcement, setAnnouncement] = useState('');
+  const [lightbox, setLightbox] = useState<Project | null>(null);
 
-    if (serviceCategory) {
-      setTimeout(() => {
-        const select = document.getElementById('service') as HTMLSelectElement | null;
-        if (select) {
-          for (let i = 0; i < select.options.length; i++) {
-            if (select.options[i].value.toLowerCase().includes('brand identity')) {
-              select.selectedIndex = i;
-              select.dispatchEvent(new Event('change', { bubbles: true }));
-              break;
-            }
-          }
-        }
-      }, 400);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const closeBtnRef = useRef<HTMLButtonElement | null>(null);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+
+  const count = projects.length;
+  const isInteracting = hovering || focused;
+
+  const announce = useCallback(
+    (index: number) => {
+      const project = projects[index];
+      setAnnouncement(`Project ${index + 1} of ${count}: ${project.title} — ${project.category}`);
+    },
+    [count],
+  );
+
+  const goTo = useCallback(
+    (index: number) => {
+      const nextIndex = (index + count) % count;
+      setActiveIndex(nextIndex);
+      announce(nextIndex);
+    },
+    [count, announce],
+  );
+
+  const nextProject = useCallback(() => goTo(activeIndex + 1), [goTo, activeIndex]);
+  const prevProject = useCallback(() => goTo(activeIndex - 1), [goTo, activeIndex]);
+
+  // Autoplay handler
+  useEffect(() => {
+    if (reduce || userPaused || isInteracting || !inView || lightbox !== null) return;
+    const timer = window.setInterval(nextProject, AUTOPLAY_MS);
+    return () => window.clearInterval(timer);
+  }, [reduce, userPaused, isInteracting, inView, lightbox, nextProject]);
+
+  // Intersection observer to pause offscreen
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), {
+      threshold: 0.15,
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Keyboard navigation on slider region
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (lightbox !== null) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      nextProject();
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      prevProject();
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      goTo(0);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      goTo(count - 1);
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openLightbox(projects[activeIndex]);
     }
   };
 
-  const p1 = projects[0]; // A²
-  const p2 = projects[1]; // WELLFIT
-  const p3 = projects[2]; // SBG
-  const p4 = projects[3]; // KRISHIKA SHREE TRAVELS
+  const openLightbox = (project: Project) => {
+    returnFocusRef.current = document.activeElement as HTMLElement | null;
+    setLightbox(project);
+  };
+
+  const closeLightbox = useCallback(() => {
+    setLightbox(null);
+    window.setTimeout(() => returnFocusRef.current?.focus(), 50);
+  }, []);
+
+  // Lock body scroll while lightbox is active
+  useEffect(() => {
+    if (!lightbox) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [lightbox]);
+
+  // Escape key for lightbox
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeLightbox();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [lightbox, closeLightbox]);
+
+  const scrollToContact = (category?: string) => {
+    document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
+    if (!category) return;
+    window.setTimeout(() => {
+      const select = document.getElementById('service') as HTMLSelectElement | null;
+      if (!select) return;
+      const target = category.toLowerCase();
+      for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].value.toLowerCase().includes(target)) {
+          select.selectedIndex = i;
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+          break;
+        }
+      }
+    }, 400);
+  };
+
+  const activeProject = projects[activeIndex];
 
   return (
-    <section id="work" className="py-24 sm:py-32 md:py-40 px-6 md:px-12 lg:px-16 bg-charcoal-950 border-b border-charcoal-800 relative">
-      <div className="max-w-7xl mx-auto space-y-24 md:space-y-36">
-        {/* Chapter 02 Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between pb-10 border-b border-charcoal-800 gap-8">
+    <section
+      id="work"
+      ref={sectionRef}
+      className="relative overflow-hidden border-b border-charcoal-800 bg-charcoal-950 px-4 py-20 sm:py-28 md:py-36 sm:px-8 md:px-12 lg:px-16"
+    >
+      {/* Ambient background radial aura */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-16 -translate-x-1/2 w-full max-w-6xl h-96 opacity-35 blur-[120px]"
+        style={{
+          background:
+            'radial-gradient(ellipse 65% 50% at 50% 30%, rgba(200,245,47,0.22) 0%, rgba(133,139,66,0.12) 45%, transparent 75%)',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Main Showcase Panel Container */}
+      <div className="relative mx-auto max-w-7xl showcase-panel p-6 sm:p-10 md:p-12 lg:p-14">
+        {/* Subtle interior glow */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-64 opacity-25"
+          style={{
+            background:
+              'radial-gradient(ellipse 70% 60% at 50% 0%, rgba(200,245,47,0.22) 0%, transparent 70%)',
+          }}
+          aria-hidden="true"
+        />
+
+        {/* ── Section Header ─────────────────────────────────────── */}
+        <div className="flex flex-col gap-8 border-b border-charcoal-800/80 pb-10 md:flex-row md:items-end md:justify-between relative z-10">
           <div>
-            <div className="flex items-center gap-3 mb-4">
-              <span className="w-2 h-2 rounded-full bg-lime shadow-[0_0_8px_rgba(212,255,0,0.8)]" />
-              <p className="font-mono text-lime font-bold text-xs tracking-[0.25em] uppercase">
-                CHAPTER 02 &mdash; THE WORK
+            <div className="mb-5 flex items-center gap-3">
+              <span className="h-2 w-2 rounded-full bg-lime shadow-[0_0_8px_rgba(200,245,47,0.8)]" />
+              <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-lime">
+                Chapter 02 — The Work
               </p>
             </div>
-            <h2 className="display-title text-warm-white">
-              SELECTED WORK<span className="text-lime">.</span>
+
+            <h2 className="display-title overflow-hidden pb-[0.06em] text-warm-white">
+              The Work<span className="text-lime">.</span>
             </h2>
+
+            <p className="mt-4 max-w-lg font-space text-base font-light leading-relaxed text-warm-muted sm:text-lg">
+              Selected identities. Distinctive ideas. Built to be remembered.
+            </p>
           </div>
 
-          <div className="max-w-md">
-            <p className="text-warm-muted text-base leading-relaxed font-light">
-              Four authentic client brand identities engineered with intentional typography,
-              symbolic weight, and bespoke visual systems.
-            </p>
+          <div className="shrink-0 border-l border-charcoal-800 pl-5 font-mono text-[0.62rem] uppercase leading-relaxed tracking-[0.24em] text-warm-muted md:border-l-0 md:pl-0 md:text-right">
+            <span className="block text-warm-white font-semibold">Selected Client Archive</span>
+            <span className="block text-lime">04 Curated Projects / 2024</span>
           </div>
         </div>
 
-        {/* ══════════════════════════════════════════════════════════
-            PROJECT 01: A² — RETURN GIFT SHOP (GOLD / CHAMPAGNE SCENE)
-           ══════════════════════════════════════════════════════════ */}
-        <motion.article
-          id={p1.id}
-          initial={{ opacity: 0, y: 35 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.85, ease: EASE_EDITORIAL }}
-          className="relative rounded-3xl border border-charcoal-800/90 overflow-hidden shadow-2xl transition-all duration-700 hover:border-[#c9a96e]/40"
-          style={{
-            background: `linear-gradient(135deg, ${p1.accentBg} 0%, rgba(10, 10, 14, 0.95) 100%)`,
-          }}
+        {/* ── 3D Coverflow Reel Slider Stage ─────────────────────── */}
+        <div
+          className="relative mt-12 sm:mt-16 md:mt-20 w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime rounded-3xl"
+          tabIndex={0}
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="V DESIGN selected client project reel"
+          onKeyDown={handleKeyDown}
+          onMouseEnter={() => setHovering(true)}
+          onMouseLeave={() => setHovering(false)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
         >
-          {/* Subtle Ambient Radial Glow */}
+          {/* Coverflow Viewport with 3D Perspective */}
           <div
-            className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none rounded-full blur-[140px] opacity-25"
-            style={{ backgroundColor: p1.themeColor }}
-            aria-hidden="true"
-          />
+            className="relative h-[440px] sm:h-[520px] md:h-[580px] w-full flex items-center justify-center overflow-hidden sm:overflow-visible select-none"
+            style={{ perspective: reduce ? 'none' : '1200px' }}
+          >
+            {projects.map((project, index) => {
+              const offset = index - activeIndex;
+              const isActive = offset === 0;
 
-          {/* Exhibition Top Bar */}
-          <div className="flex flex-wrap items-center justify-between px-6 sm:px-10 py-5 border-b border-charcoal-800/80 bg-charcoal-950/60 backdrop-blur-md gap-4">
-            <div className="flex items-center gap-3 font-mono text-xs">
-              <span className="text-lime font-bold">{p1.number}</span>
-              <span className="w-3 h-px bg-charcoal-700" />
-              <span className="text-warm-white font-space font-semibold tracking-widest uppercase">
-                {p1.title} &mdash; {p1.category}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 font-mono text-[0.65rem] text-warm-dim">
-              <span>AUTHENTIC CLIENT WORK</span>
-              <span className="text-charcoal-700">/</span>
-              <span>{p1.year}</span>
-            </div>
-          </div>
+              // Responsive calculations for 3D transforms
+              let xPercent = 0;
+              let rotateY = 0;
+              let scale = 1;
+              let zIndex = 30;
+              let opacity = 1;
+              let filter = 'blur(0px)';
 
-          {/* Exhibition Content Grid */}
-          <div className="p-6 sm:p-10 md:p-14 grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-14 items-center">
-            {/* Artwork Display Stage */}
-            <div className="lg:col-span-7 relative group flex items-center justify-center">
-              <div
-                className="relative w-full max-w-xl aspect-square rounded-2xl overflow-hidden p-6 sm:p-10 flex items-center justify-center border border-charcoal-800 bg-charcoal-950/80 shadow-2xl transition-all duration-700 group-hover:border-[#c9a96e]/50"
-                style={{
-                  boxShadow: `0 20px 60px -20px ${p1.glowColor}`,
-                }}
-              >
-                <img
-                  src={p1.image}
-                  alt={`${p1.title} — ${p1.category}`}
-                  className="max-h-full max-w-full object-contain filter contrast-[1.03] transition-transform duration-700 ease-out group-hover:scale-105"
-                  loading="lazy"
-                />
+              if (reduce) {
+                // Reduced motion: 2D side-by-side transition
+                xPercent = offset * 75;
+                scale = isActive ? 1 : 0.88;
+                opacity = isActive ? 1 : 0.45;
+                zIndex = 30 - Math.abs(offset) * 5;
+              } else {
+                if (isActive) {
+                  xPercent = 0;
+                  rotateY = 0;
+                  scale = 1;
+                  zIndex = 30;
+                  opacity = 1;
+                  filter = 'blur(0px)';
+                } else if (offset === -1) {
+                  xPercent = -68;
+                  rotateY = 25;
+                  scale = 0.84;
+                  zIndex = 20;
+                  opacity = 0.6;
+                  filter = 'blur(1px)';
+                } else if (offset === 1) {
+                  xPercent = 68;
+                  rotateY = -25;
+                  scale = 0.84;
+                  zIndex = 20;
+                  opacity = 0.6;
+                  filter = 'blur(1px)';
+                } else if (offset < -1) {
+                  xPercent = -120;
+                  rotateY = 38;
+                  scale = 0.72;
+                  zIndex = 10;
+                  opacity = 0.25;
+                  filter = 'blur(3px)';
+                } else {
+                  xPercent = 120;
+                  rotateY = -38;
+                  scale = 0.72;
+                  zIndex = 10;
+                  opacity = 0.25;
+                  filter = 'blur(3px)';
+                }
+              }
 
-                {/* Inspect Button */}
-                <button
-                  type="button"
-                  onClick={() => setSelectedProject(p1)}
-                  className="absolute top-4 right-4 p-3 rounded-full bg-charcoal-900/90 border border-charcoal-700 text-warm-muted hover:text-lime hover:border-lime transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-lg"
-                  title="Expand Artwork"
-                  aria-label={`View full artwork for ${p1.title}`}
+              return (
+                <motion.div
+                  key={project.id}
+                  className="absolute top-1/2 left-1/2 cursor-pointer will-change-transform"
+                  style={{
+                    width: 'min(82vw, 360px)',
+                    height: 'min(125vw, 530px)',
+                    zIndex,
+                  }}
+                  animate={{
+                    x: `calc(-50% + ${xPercent}%)`,
+                    y: '-50%',
+                    rotateY: reduce ? 0 : rotateY,
+                    scale,
+                    opacity,
+                    filter: reduce ? 'none' : filter,
+                  }}
+                  transition={{
+                    duration: 0.65,
+                    ease: EASE,
+                  }}
+                  onClick={() => {
+                    if (isActive) {
+                      openLightbox(project);
+                    } else {
+                      goTo(index);
+                    }
+                  }}
+                  // Swipe/Drag gesture support on active or neighbor cards
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.2}
+                  onDragEnd={(_e, { offset: dragOffset, velocity }) => {
+                    if (dragOffset.x < -40 || velocity.x < -300) {
+                      nextProject();
+                    } else if (dragOffset.x > 40 || velocity.x > 300) {
+                      prevProject();
+                    }
+                  }}
                 >
-                  <Maximize2 size={16} />
-                </button>
-              </div>
-            </div>
-
-            {/* Typography & Editorial Details */}
-            <div className="lg:col-span-5 space-y-6">
-              <div className="space-y-2">
-                <span className="font-mono text-xs font-bold tracking-widest text-lime uppercase block">
-                  {p1.number} &mdash; {p1.category}
-                </span>
-                <h3 className="text-4xl sm:text-5xl md:text-6xl font-display font-extrabold text-warm-white tracking-tight uppercase">
-                  {p1.title}
-                </h3>
-                <p className="font-space text-lg text-warm-muted font-light pt-1">
-                  {p1.category}
-                </p>
-              </div>
-
-              <p className="text-warm-muted text-base leading-relaxed font-light">
-                {p1.summary}
-              </p>
-
-              {/* Color Swatch Bar Drawn from Artwork */}
-              <div className="space-y-2 pt-2">
-                <span className="font-mono text-[0.62rem] text-warm-dim tracking-widest block">
-                  PALETTE HARMONY
-                </span>
-                <div className="flex items-center gap-2">
-                  {p1.palette.map((hex) => (
+                  {/* Portrait Card Surface */}
+                  <div
+                    className={`relative w-full h-full rounded-[24px] sm:rounded-[28px] border transition-all duration-500 overflow-hidden flex flex-col justify-between ${
+                      isActive
+                        ? 'border-lime/60 bg-[#161A13] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8),0_0_35px_-5px_rgba(200,245,47,0.22)]'
+                        : 'border-white/10 bg-[#141712] hover:border-white/20'
+                    }`}
+                  >
+                    {/* Top ambient color reflection matching project */}
                     <div
-                      key={hex}
-                      className="w-7 h-7 rounded-md border border-charcoal-700 shadow-sm"
-                      style={{ backgroundColor: hex }}
-                      title={hex}
+                      className="pointer-events-none absolute inset-x-0 top-0 h-44 opacity-25"
+                      style={{
+                        background: `radial-gradient(ellipse at 50% 0%, ${project.themeColor} 0%, transparent 70%)`,
+                      }}
+                      aria-hidden="true"
                     />
-                  ))}
-                </div>
-              </div>
 
-              <div className="pt-4 border-t border-charcoal-800">
-                <button
-                  type="button"
-                  onClick={() => scrollToContact(p1.category)}
-                  className="inline-flex items-center gap-3 px-6 py-3.5 rounded-full bg-charcoal-900 hover:bg-lime text-warm-white hover:text-charcoal-950 font-space text-xs font-bold tracking-[0.18em] uppercase transition-all duration-300 border border-charcoal-700 hover:border-lime cursor-pointer group"
-                >
-                  <span>INQUIRE THIS STYLE</span>
-                  <ArrowUpRight size={14} className="text-lime group-hover:text-charcoal-950 transition-colors" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </motion.article>
+                    {/* Card Header Row */}
+                    <div className="relative z-10 flex items-center justify-between border-b border-white/[0.08] px-5 sm:px-6 py-4">
+                      <div className="flex items-center gap-2.5">
+                        <span
+                          className="h-1.5 w-1.5 rounded-full"
+                          style={{ backgroundColor: project.themeColor }}
+                        />
+                        <span className="font-mono text-xs font-bold tracking-[0.25em] text-lime">
+                          {project.number}
+                        </span>
+                      </div>
+                      <span className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-warm-muted">
+                        {project.year}
+                      </span>
+                    </div>
 
-        {/* ══════════════════════════════════════════════════════════
-            PROJECT 02: WELLFIT — MUA ARTIST (ROSE METALLIC EDITORIAL)
-           ══════════════════════════════════════════════════════════ */}
-        <motion.article
-          id={p2.id}
-          initial={{ opacity: 0, y: 35 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.85, ease: EASE_EDITORIAL }}
-          className="relative rounded-3xl border border-charcoal-800/90 overflow-hidden shadow-2xl transition-all duration-700 hover:border-[#d8a48f]/40"
-          style={{
-            background: `linear-gradient(135deg, ${p2.accentBg} 0%, rgba(10, 10, 14, 0.95) 100%)`,
-          }}
-        >
-          <div
-            className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none rounded-full blur-[140px] opacity-25"
-            style={{ backgroundColor: p2.themeColor }}
-            aria-hidden="true"
-          />
+                    {/* Artwork Center Stage — Real project image displayed pristine without clipping */}
+                    <div className="relative z-10 flex-1 flex items-center justify-center p-6 sm:p-8 overflow-hidden group/art">
+                      {/* Subdued project number watermark in background */}
+                      <span
+                        className="pointer-events-none absolute select-none font-display font-black text-[clamp(6rem,16vw,10rem)] leading-none opacity-[0.06] text-warm-white"
+                        aria-hidden="true"
+                      >
+                        {project.number}
+                      </span>
 
-          <div className="flex flex-wrap items-center justify-between px-6 sm:px-10 py-5 border-b border-charcoal-800/80 bg-charcoal-950/60 backdrop-blur-md gap-4">
-            <div className="flex items-center gap-3 font-mono text-xs">
-              <span className="text-lime font-bold">{p2.number}</span>
-              <span className="w-3 h-px bg-charcoal-700" />
-              <span className="text-warm-white font-space font-semibold tracking-widest uppercase">
-                {p2.title} &mdash; {p2.category}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 font-mono text-[0.65rem] text-warm-dim">
-              <span>AUTHENTIC CLIENT WORK</span>
-              <span className="text-charcoal-700">/</span>
-              <span>{p2.year}</span>
-            </div>
-          </div>
-
-          <div className="p-6 sm:p-10 md:p-14 space-y-10">
-            {/* Wide Landscape Artwork Display */}
-            <div className="relative group flex items-center justify-center">
-              <div
-                className="relative w-full max-w-4xl aspect-[16/9] sm:aspect-[2/1] rounded-2xl overflow-hidden p-6 sm:p-10 flex items-center justify-center border border-charcoal-800 bg-charcoal-950/80 shadow-2xl transition-all duration-700 group-hover:border-[#d8a48f]/50"
-                style={{
-                  boxShadow: `0 20px 60px -20px ${p2.glowColor}`,
-                }}
-              >
-                <img
-                  src={p2.image}
-                  alt={`${p2.title} — ${p2.category}`}
-                  className="max-h-full max-w-full object-contain filter contrast-[1.03] transition-transform duration-700 ease-out group-hover:scale-105"
-                  loading="lazy"
-                />
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedProject(p2)}
-                  className="absolute top-4 right-4 p-3 rounded-full bg-charcoal-900/90 border border-charcoal-700 text-warm-muted hover:text-lime hover:border-lime transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-lg"
-                  aria-label={`View full artwork for ${p2.title}`}
-                >
-                  <Maximize2 size={16} />
-                </button>
-              </div>
-            </div>
-
-            {/* Typography Stack */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pt-2">
-              <div className="lg:col-span-7 space-y-2">
-                <span className="font-mono text-xs font-bold tracking-widest text-lime uppercase block">
-                  {p2.number} &mdash; {p2.category}
-                </span>
-                <h3 className="text-3xl sm:text-4xl md:text-5xl font-display font-extrabold text-warm-white tracking-tight uppercase">
-                  {p2.title}
-                </h3>
-                <p className="text-warm-muted text-base leading-relaxed font-light pt-2 max-w-2xl">
-                  {p2.summary}
-                </p>
-              </div>
-
-              <div className="lg:col-span-5 flex flex-col sm:flex-row lg:flex-col lg:items-end justify-between gap-6">
-                <div className="space-y-2">
-                  <span className="font-mono text-[0.62rem] text-warm-dim tracking-widest block">
-                    ROSE-METALLIC PALETTE
-                  </span>
-                  <div className="flex items-center gap-2">
-                    {p2.palette.map((hex) => (
-                      <div
-                        key={hex}
-                        className="w-7 h-7 rounded-md border border-charcoal-700 shadow-sm"
-                        style={{ backgroundColor: hex }}
-                        title={hex}
+                      <img
+                        src={project.image}
+                        alt={`Original brand asset for ${project.title}`}
+                        className="max-h-full max-w-full object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.7)] transition-transform duration-700 ease-out group-hover/art:scale-105"
                       />
-                    ))}
+                    </div>
+
+                    {/* Card Footer Identity Block */}
+                    <div className="relative z-10 border-t border-white/[0.08] bg-[#141712]/80 backdrop-blur-md px-5 sm:px-6 py-4 sm:py-5 flex items-center justify-between gap-4">
+                      <div className="min-w-0">
+                        <h3 className="font-display text-lg sm:text-xl font-bold uppercase tracking-tight text-warm-white truncate">
+                          {project.title}
+                        </h3>
+                        <p className="mt-0.5 font-space text-xs font-light text-warm-muted truncate">
+                          {project.category}
+                        </p>
+                      </div>
+
+                      {/* Pill Preview Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openLightbox(project);
+                        }}
+                        className={`pill-btn-lime shrink-0 !py-2 !px-4 text-[0.68rem] font-bold shadow-md ${
+                          !isActive ? 'opacity-70 group-hover:opacity-100' : ''
+                        }`}
+                        aria-label={`Inspect ${project.title} artwork`}
+                      >
+                        <span>Preview</span>
+                        <span>→</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* ── Active Project Detail Banner & Transport Controls ──── */}
+          <div className="mt-8 sm:mt-12 pt-8 border-t border-charcoal-800/80 flex flex-col md:flex-row md:items-center md:justify-between gap-6 relative z-10">
+            {/* Left: Active Project Focus Specs */}
+            <div className="space-y-1.5 max-w-md">
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-xs font-bold text-lime tracking-widest">
+                  {activeProject.number} / {String(count).padStart(2, '0')}
+                </span>
+                <span className="h-px w-4 bg-charcoal-700" />
+                <span className="font-mono text-[0.62rem] uppercase tracking-widest text-warm-dim">
+                  {DISCIPLINE}
+                </span>
+              </div>
+              <p className="font-display text-xl sm:text-2xl font-bold uppercase text-warm-white tracking-tight">
+                {activeProject.title} — {activeProject.category}
+              </p>
+              <p className="font-space text-xs sm:text-sm font-light text-warm-muted leading-relaxed line-clamp-2">
+                {activeProject.summary}
+              </p>
+            </div>
+
+            {/* Right: Progress Indicator + Previous / Next Controls */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-5 shrink-0">
+              {/* Segmented Progress Pills */}
+              <div className="flex items-center gap-2">
+                {projects.map((p, idx) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => goTo(idx)}
+                    aria-label={`Jump to project ${idx + 1}: ${p.title}`}
+                    aria-current={idx === activeIndex ? 'true' : undefined}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      idx === activeIndex ? 'w-10 bg-lime shadow-[0_0_8px_#C8F52F]' : 'w-4 bg-white/20 hover:bg-white/40'
+                    }`}
+                  />
+                ))}
+              </div>
+
+              {/* Prev / Next & Autoplay Buttons */}
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={prevProject}
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-charcoal-700 bg-charcoal-900/80 text-warm-white transition-all duration-200 hover:border-lime hover:text-lime focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime cursor-pointer"
+                  aria-label="Previous project in reel"
+                >
+                  <ChevronLeft size={18} />
+                </button>
 
                 <button
                   type="button"
-                  onClick={() => scrollToContact(p2.category)}
-                  className="inline-flex items-center gap-3 px-6 py-3.5 rounded-full bg-charcoal-900 hover:bg-lime text-warm-white hover:text-charcoal-950 font-space text-xs font-bold tracking-[0.18em] uppercase transition-all duration-300 border border-charcoal-700 hover:border-lime cursor-pointer group"
+                  onClick={nextProject}
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-charcoal-700 bg-charcoal-900/80 text-warm-white transition-all duration-200 hover:border-lime hover:text-lime focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime cursor-pointer"
+                  aria-label="Next project in reel"
                 >
-                  <span>INQUIRE BEAUTY IDENTITY</span>
-                  <ArrowUpRight size={14} className="text-lime group-hover:text-charcoal-950 transition-colors" />
+                  <ChevronRight size={18} />
+                </button>
+
+                {!reduce && (
+                  <button
+                    type="button"
+                    onClick={() => setUserPaused((p) => !p)}
+                    className="flex h-11 items-center justify-center gap-2 rounded-full border border-charcoal-700 bg-charcoal-900/80 px-4 font-mono text-[0.62rem] uppercase tracking-widest text-warm-white transition-all duration-200 hover:border-lime hover:text-lime cursor-pointer"
+                    aria-label={userPaused ? 'Play reel autoplay' : 'Pause reel autoplay'}
+                  >
+                    {userPaused ? <Play size={13} className="text-lime" /> : <Pause size={13} />}
+                    <span className="hidden sm:inline">{userPaused ? 'PLAY' : 'PAUSE'}</span>
+                  </button>
+                )}
+
+                {/* Inspect artwork CTA */}
+                <button
+                  type="button"
+                  onClick={() => openLightbox(activeProject)}
+                  className="pill-btn-dark !py-2.5 !px-5 text-[0.7rem] font-bold cursor-pointer hidden lg:inline-flex"
+                >
+                  <Eye size={13} className="text-lime" />
+                  <span>VIEW FULL CASE</span>
                 </button>
               </div>
             </div>
           </div>
-        </motion.article>
 
-        {/* ══════════════════════════════════════════════════════════
-            PROJECT 03 & 04: SBG & KRISHIKA SHREE TRAVELS (PARALLEL EXHIBITION)
-           ══════════════════════════════════════════════════════════ */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-12">
-          {/* PROJECT 03: SBG — HOMEMADE BROWNIES */}
-          <motion.article
-            id={p3.id}
-            initial={{ opacity: 0, y: 35 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.85, ease: EASE_EDITORIAL }}
-            className="relative rounded-3xl border border-charcoal-800/90 overflow-hidden shadow-2xl transition-all duration-700 hover:border-[#c27d42]/40 flex flex-col justify-between"
-            style={{
-              background: `linear-gradient(135deg, ${p3.accentBg} 0%, rgba(10, 10, 14, 0.95) 100%)`,
-            }}
-          >
-            <div
-              className="absolute top-0 right-0 w-[350px] h-[350px] pointer-events-none rounded-full blur-[120px] opacity-25"
-              style={{ backgroundColor: p3.themeColor }}
-              aria-hidden="true"
-            />
-
-            <div className="flex items-center justify-between px-6 py-4 border-b border-charcoal-800/80 bg-charcoal-950/60 backdrop-blur-md">
-              <div className="flex items-center gap-3 font-mono text-xs">
-                <span className="text-lime font-bold">{p3.number}</span>
-                <span className="w-3 h-px bg-charcoal-700" />
-                <span className="text-warm-white font-space font-semibold tracking-widest uppercase">
-                  {p3.title} &mdash; {p3.category}
-                </span>
-              </div>
-              <span className="font-mono text-[0.65rem] text-warm-dim">{p3.year}</span>
-            </div>
-
-            <div className="p-6 sm:p-8 space-y-6">
-              <div className="relative group flex items-center justify-center">
-                <div
-                  className="relative w-full aspect-square max-w-sm rounded-2xl overflow-hidden p-6 flex items-center justify-center border border-charcoal-800 bg-charcoal-950/80 shadow-2xl transition-all duration-700 group-hover:border-[#c27d42]/50"
-                  style={{
-                    boxShadow: `0 20px 50px -20px ${p3.glowColor}`,
-                  }}
-                >
-                  <img
-                    src={p3.image}
-                    alt={`${p3.title} — ${p3.category}`}
-                    className="max-h-full max-w-full object-contain filter contrast-[1.03] transition-transform duration-700 ease-out group-hover:scale-105"
-                    loading="lazy"
-                  />
-
-                  <button
-                    type="button"
-                    onClick={() => setSelectedProject(p3)}
-                    className="absolute top-4 right-4 p-3 rounded-full bg-charcoal-900/90 border border-charcoal-700 text-warm-muted hover:text-lime hover:border-lime transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-lg"
-                    aria-label={`View full artwork for ${p3.title}`}
-                  >
-                    <Maximize2 size={16} />
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <span className="font-mono text-xs font-bold tracking-widest text-lime uppercase block">
-                  {p3.number} &mdash; {p3.category}
-                </span>
-                <h3 className="text-3xl sm:text-4xl font-display font-extrabold text-warm-white tracking-tight uppercase">
-                  {p3.title}
-                </h3>
-                <p className="text-warm-muted text-sm sm:text-base leading-relaxed font-light pt-1">
-                  {p3.summary}
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between pt-4 border-t border-charcoal-800">
-                <div className="flex items-center gap-1.5">
-                  {p3.palette.map((hex) => (
-                    <div
-                      key={hex}
-                      className="w-5 h-5 rounded-md border border-charcoal-700"
-                      style={{ backgroundColor: hex }}
-                      title={hex}
-                    />
-                  ))}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => scrollToContact(p3.category)}
-                  className="inline-flex items-center gap-2 text-xs font-space font-bold uppercase tracking-[0.18em] text-warm-white hover:text-lime transition-colors cursor-pointer group"
-                >
-                  <span>INQUIRE ARTISAN BRAND</span>
-                  <ArrowUpRight size={14} className="text-lime group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                </button>
-              </div>
-            </div>
-          </motion.article>
-
-          {/* PROJECT 04: KRISHIKA SHREE TRAVELS */}
-          <motion.article
-            id={p4.id}
-            initial={{ opacity: 0, y: 35 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.85, delay: 0.1, ease: EASE_EDITORIAL }}
-            className="relative rounded-3xl border border-charcoal-800/90 overflow-hidden shadow-2xl transition-all duration-700 hover:border-[#0ea5e9]/40 flex flex-col justify-between"
-            style={{
-              background: `linear-gradient(135deg, ${p4.accentBg} 0%, rgba(10, 10, 14, 0.95) 100%)`,
-            }}
-          >
-            <div
-              className="absolute top-0 right-0 w-[350px] h-[350px] pointer-events-none rounded-full blur-[120px] opacity-25"
-              style={{ backgroundColor: p4.themeColor }}
-              aria-hidden="true"
-            />
-
-            <div className="flex items-center justify-between px-6 py-4 border-b border-charcoal-800/80 bg-charcoal-950/60 backdrop-blur-md">
-              <div className="flex items-center gap-3 font-mono text-xs">
-                <span className="text-lime font-bold">{p4.number}</span>
-                <span className="w-3 h-px bg-charcoal-700" />
-                <span className="text-warm-white font-space font-semibold tracking-widest uppercase">
-                  {p4.title} &mdash; {p4.category}
-                </span>
-              </div>
-              <span className="font-mono text-[0.65rem] text-warm-dim">{p4.year}</span>
-            </div>
-
-            <div className="p-6 sm:p-8 space-y-6">
-              <div className="relative group flex items-center justify-center">
-                <div
-                  className="relative w-full aspect-square max-w-sm rounded-2xl overflow-hidden p-6 flex items-center justify-center border border-charcoal-800 bg-charcoal-950/80 shadow-2xl transition-all duration-700 group-hover:border-[#0ea5e9]/50"
-                  style={{
-                    boxShadow: `0 20px 50px -20px ${p4.glowColor}`,
-                  }}
-                >
-                  <img
-                    src={p4.image}
-                    alt={`${p4.title} — ${p4.category}`}
-                    className="max-h-full max-w-full object-contain filter contrast-[1.03] transition-transform duration-700 ease-out group-hover:scale-105"
-                    loading="lazy"
-                  />
-
-                  <button
-                    type="button"
-                    onClick={() => setSelectedProject(p4)}
-                    className="absolute top-4 right-4 p-3 rounded-full bg-charcoal-900/90 border border-charcoal-700 text-warm-muted hover:text-lime hover:border-lime transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-lg"
-                    aria-label={`View full artwork for ${p4.title}`}
-                  >
-                    <Maximize2 size={16} />
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <span className="font-mono text-xs font-bold tracking-widest text-lime uppercase block">
-                  {p4.number} &mdash; {p4.category}
-                </span>
-                <h3 className="text-2xl sm:text-3xl font-display font-extrabold text-warm-white tracking-tight uppercase">
-                  {p4.title}
-                </h3>
-                <p className="text-warm-muted text-sm sm:text-base leading-relaxed font-light pt-1">
-                  {p4.summary}
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between pt-4 border-t border-charcoal-800">
-                <div className="flex items-center gap-1.5">
-                  {p4.palette.map((hex) => (
-                    <div
-                      key={hex}
-                      className="w-5 h-5 rounded-md border border-charcoal-700"
-                      style={{ backgroundColor: hex }}
-                      title={hex}
-                    />
-                  ))}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => scrollToContact(p4.category)}
-                  className="inline-flex items-center gap-2 text-xs font-space font-bold uppercase tracking-[0.18em] text-warm-white hover:text-lime transition-colors cursor-pointer group"
-                >
-                  <span>INQUIRE TRAVEL BRAND</span>
-                  <ArrowUpRight size={14} className="text-lime group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                </button>
-              </div>
-            </div>
-          </motion.article>
+          {/* Accessible Screen Reader Announcer */}
+          <p className="sr-only" role="status" aria-live="polite">
+            {announcement}
+          </p>
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════════════════════
-          ACCESSIBLE LIGHTBOX INSPECTOR FOR ORIGINAL ARTWORK
-         ══════════════════════════════════════════════════════════ */}
+      {/* ── Artwork Lightbox Inspection Modal ────────────────────── */}
       <AnimatePresence>
-        {selectedProject && (
+        {lightbox && (
           <motion.div
+            ref={dialogRef}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-charcoal-950/98 backdrop-blur-2xl flex flex-col justify-between p-6 sm:p-10 select-none"
-            onClick={() => setSelectedProject(null)}
+            transition={{ duration: reduce ? 0 : 0.3 }}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${lightbox.title} project details`}
+            onClick={closeLightbox}
+            className="fixed inset-0 z-[100] flex select-none flex-col justify-between bg-charcoal-950/95 p-6 backdrop-blur-2xl sm:p-10"
           >
             {/* Lightbox Header */}
             <div
-              className="flex items-center justify-between border-b border-charcoal-800 pb-4 max-w-6xl mx-auto w-full"
+              className="mx-auto flex w-full max-w-6xl items-center justify-between border-b border-charcoal-800 pb-4"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-3">
-                <span className="font-mono text-lime font-bold text-sm">
-                  {selectedProject.number}
-                </span>
-                <span className="w-3 h-px bg-charcoal-700" />
-                <span className="font-space text-sm font-bold text-warm-white tracking-widest uppercase">
-                  {selectedProject.title} &mdash; {selectedProject.category}
+                <span className="font-mono text-sm font-bold text-lime">{lightbox.number}</span>
+                <span className="h-px w-3 bg-charcoal-700" />
+                <span className="font-space text-sm font-bold uppercase tracking-widest text-warm-white">
+                  {lightbox.title} — {lightbox.category}
                 </span>
               </div>
-
               <button
+                ref={closeBtnRef}
                 type="button"
-                onClick={() => setSelectedProject(null)}
-                className="p-2.5 rounded-full border border-charcoal-700 bg-charcoal-900 text-warm-muted hover:text-lime hover:border-lime transition-colors cursor-pointer"
-                aria-label="Close Preview"
+                onClick={closeLightbox}
+                aria-label="Close preview"
+                className="cursor-pointer rounded-full border border-charcoal-700 bg-charcoal-900 p-2.5 text-warm-muted transition-colors hover:border-lime hover:text-lime focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime"
               >
                 <X size={18} />
               </button>
             </div>
 
-            {/* Lightbox Image Stage */}
+            {/* Lightbox Center Artwork */}
             <div
-              className="my-auto flex items-center justify-center p-4 max-w-4xl mx-auto w-full"
+              className="mx-auto my-auto flex w-full max-w-4xl items-center justify-center p-4"
               onClick={(e) => e.stopPropagation()}
             >
               <img
-                src={selectedProject.image}
-                alt={`${selectedProject.title} — ${selectedProject.category}`}
-                className="max-h-[75vh] w-auto max-w-full object-contain shadow-2xl rounded-2xl border border-charcoal-800"
+                src={lightbox.image}
+                alt={`Original brand asset for ${lightbox.title} — ${lightbox.category}`}
+                className="max-h-[66vh] w-auto max-w-full rounded-2xl border border-charcoal-800 object-contain shadow-2xl"
               />
             </div>
 
             {/* Lightbox Footer */}
             <div
-              className="flex items-center justify-between border-t border-charcoal-800 pt-4 max-w-6xl mx-auto w-full font-mono text-warm-dim text-[0.65rem]"
+              className="mx-auto flex w-full max-w-6xl flex-col gap-4 border-t border-charcoal-800 pt-4 sm:flex-row sm:items-center sm:justify-between"
               onClick={(e) => e.stopPropagation()}
             >
-              <span>{selectedProject.category}</span>
-              <span className="text-lime">AUTHENTIC V DESIGN CLIENT ARCHIVE</span>
-              <span>CLICK ANYWHERE OR ESC TO CLOSE</span>
+              <div className="max-w-xl">
+                <p className="font-mono text-[0.62rem] uppercase tracking-[0.24em] text-lime">
+                  {DISCIPLINE}
+                </p>
+                <p className="mt-1.5 font-space text-sm font-light leading-relaxed text-warm-muted">
+                  {lightbox.summary}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const cat = lightbox.category;
+                  closeLightbox();
+                  scrollToContact(cat);
+                }}
+                className="pill-btn-lime cursor-pointer shrink-0 !py-3 !px-6 text-xs font-bold"
+              >
+                <span>START A SIMILAR PROJECT</span>
+                <ArrowUpRight size={14} />
+              </button>
             </div>
           </motion.div>
         )}

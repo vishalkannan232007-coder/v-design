@@ -42,24 +42,34 @@ export function ProcessSection() {
   return (
     <section
       id="process"
-      className="py-24 sm:py-32 md:py-40 px-6 md:px-12 lg:px-16 bg-charcoal-950 border-b border-charcoal-800 relative overflow-hidden"
+      className="py-20 sm:py-28 md:py-36 px-4 sm:px-8 md:px-12 lg:px-16 bg-charcoal-950 border-b border-charcoal-800 relative overflow-hidden"
     >
-      {/* Subtle background watermark */}
+      {/* Ambient background glow for the showcase panel */}
       <div
-        className="absolute left-0 top-1/2 -translate-y-1/2 pointer-events-none select-none opacity-[0.025]"
+        className="pointer-events-none absolute left-1/2 top-16 -translate-x-1/2 w-full max-w-6xl h-96 opacity-35 blur-[110px]"
+        style={{
+          background:
+            'radial-gradient(ellipse 65% 50% at 50% 30%, rgba(200,245,47,0.18) 0%, rgba(133,139,66,0.12) 45%, transparent 75%)',
+        }}
         aria-hidden="true"
-      >
-        <span className="font-display font-black text-[28vw] leading-none tracking-tighter text-warm-white">
-          PROC
-        </span>
-      </div>
+      />
 
-      <div className="max-w-7xl mx-auto relative z-10 space-y-16 sm:space-y-20">
+      <div className="relative mx-auto max-w-7xl showcase-panel p-6 sm:p-10 md:p-12 lg:p-14 space-y-12 sm:space-y-16">
+        {/* Subtle interior glow */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-64 opacity-25"
+          style={{
+            background:
+              'radial-gradient(ellipse 70% 60% at 50% 0%, rgba(200,245,47,0.22) 0%, transparent 70%)',
+          }}
+          aria-hidden="true"
+        />
+
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between pb-10 border-b border-charcoal-800 gap-8">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between pb-10 border-b border-charcoal-800/80 gap-8 relative z-10">
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <span className="w-2 h-2 rounded-full bg-lime shadow-[0_0_8px_rgba(212,255,0,0.8)]" />
+              <span className="w-2 h-2 rounded-full bg-lime shadow-[0_0_8px_rgba(200,245,47,0.8)]" />
               <p className="font-mono text-lime font-bold text-xs tracking-[0.25em] uppercase">
                 THE PROCESS &mdash; HOW WE WORK
               </p>
@@ -140,7 +150,7 @@ export function ProcessSection() {
           <button
             type="button"
             onClick={scrollToContact}
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-lime hover:bg-lime-hover text-charcoal-950 font-space text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 shadow-[0_0_25px_rgba(212,255,0,0.3)] hover:shadow-[0_0_40px_rgba(212,255,0,0.5)] cursor-pointer whitespace-nowrap"
+            className="pill-btn-lime !py-3.5 !px-8 text-xs font-bold tracking-[0.2em] whitespace-nowrap cursor-pointer"
           >
             <span>BEGIN YOUR PROJECT</span>
             <ArrowUpRight size={14} />

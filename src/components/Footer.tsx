@@ -1,10 +1,10 @@
 import { ArrowUp } from 'lucide-react';
-import vDesignLogo from '../assets/brand/V-DESIGN-LOGO.png';
+import vDesignLogo from '../assets/brand/V-DESIGN-LOGO-transparent.png';
 
 const navLinks = [
   { href: '#opening', label: 'OPENING', chapter: '01' },
   { href: '#work', label: 'THE WORK', chapter: '02' },
-  { href: '#services', label: 'WHAT WE DO', chapter: '03' },
+  { href: '#services', label: 'SERVICES', chapter: '03' },
   { href: '#studio', label: 'THE STUDIO', chapter: '04' },
   { href: '#contact', label: "LET'S START", chapter: '05' },
 ];
@@ -57,7 +57,7 @@ export function Footer() {
 
             <div className="flex items-center gap-3 pt-1 font-mono text-[0.62rem] text-warm-dim">
               <span className="w-1.5 h-1.5 rounded-full bg-lime animate-pulse" />
-              <span className="tracking-[0.25em] uppercase">CHENNAI &middot; GLOBAL COMMISSIONS</span>
+              <span className="tracking-[0.25em] uppercase">INDEPENDENT PRACTICE</span>
             </div>
           </div>
 
@@ -92,10 +92,10 @@ export function Footer() {
             </p>
             <div className="space-y-2 text-xs font-light">
               <a
-                href="mailto:vishalkannan232007@gmail.com"
+                href="mailto:vdesignworks028@gmail.com"
                 className="block text-warm-white hover:text-lime transition-colors break-all"
               >
-                vishalkannan232007@gmail.com
+                vdesignworks028@gmail.com
               </a>
               <a
                 href="https://wa.me/919585057340"

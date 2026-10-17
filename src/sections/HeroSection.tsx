@@ -1,283 +1,220 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, ArrowDown, Play, Sparkles } from 'lucide-react';
-import { projects } from '../data/projects';
+import { motion } from 'framer-motion';
+import { ArrowDown, ArrowUpRight } from 'lucide-react';
+import { WhiteMagneticFieldBackground } from '../components/WhiteMagneticFieldBackground';
+import { LiquidGlassOverlay } from '../components/LiquidGlassOverlay';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 
-const EASE_EDITORIAL: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
-export function HeroSection() {
-  const [activeProjectIndex, setActiveProjectIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
+interface HeroSectionProps {
+  /** When true, the hero entrance choreography plays (set after the intro reveals). */
+  started: boolean;
+}
 
-  // Auto-advance showreel every 4.5 seconds
-  useEffect(() => {
-    if (!isPlaying) return;
-    const interval = setInterval(() => {
-      setActiveProjectIndex((prev) => (prev + 1) % projects.length);
-    }, 4500);
-    return () => clearInterval(interval);
-  }, [isPlaying]);
+export function HeroSection({ started }: HeroSectionProps) {
+  const reduce = usePrefersReducedMotion();
 
-  const activeProject = projects[activeProjectIndex];
+  const scrollToWork = () => document.querySelector('#work')?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToContact = () => document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
 
-  const scrollToWork = () => {
-    document.querySelector('#work')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const scrollToContact = () => {
-    document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const hiddenLine = reduce ? { opacity: 0 } : { y: '115%', opacity: 0 };
+  const showLine = (delay: number) =>
+    reduce
+      ? { opacity: 1, transition: { duration: 0.4 } }
+      : { y: 0, opacity: 1, transition: { duration: 0.95, delay, ease: EASE } };
+  const fade = (delay: number) =>
+    reduce
+      ? { opacity: 1, y: 0, transition: { duration: 0.4 } }
+      : { opacity: 1, y: 0, transition: { duration: 0.8, delay, ease: EASE } };
+  const fadeHidden = (from = 18) => ({ opacity: 0, y: reduce ? 0 : from });
 
   return (
     <section
       id="opening"
-      className="relative min-h-screen w-full flex flex-col justify-between pt-28 sm:pt-32 md:pt-36 pb-10 px-6 md:px-12 lg:px-16 bg-charcoal-950 overflow-hidden transition-colors duration-1000"
-      style={{
-        backgroundImage: [
-          `radial-gradient(ellipse 80% 65% at 72% 40%, ${activeProject.glowColor} 0%, transparent 65%)`,
-          `radial-gradient(ellipse 55% 50% at 20% 80%, rgba(180, 70, 10, 0.10) 0%, transparent 70%)`,
-          `radial-gradient(ellipse 40% 35% at 85% 85%, rgba(194, 100, 28, 0.06) 0%, transparent 60%)`,
-        ].join(', '),
-      }}
+      className="relative isolate flex min-h-[100svh] w-full flex-col overflow-hidden bg-[#090B09]"
     >
-      {/* Persistent warm amber base — cinematic atmosphere */}
+      {/* LAYER 1 & 2: Base Dark Background + White Magnetic-Field Particle Simulation */}
+      <WhiteMagneticFieldBackground started={started} />
+
+      {/* LAYER 3: Translucent Green Liquid-Glass Shader Effect */}
+      <LiquidGlassOverlay className="z-[1]" intensity="medium" />
+
+      {/* LAYER 4: Subtle Readability Overlay (preserves clean contrast for left-aligned typography) */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-100"
-        style={{
-          background: [
-            'radial-gradient(ellipse 50% 40% at 15% 15%, rgba(210,90,20,0.09) 0%, transparent 65%)',
-            'radial-gradient(ellipse 35% 30% at 90% 10%, rgba(220,110,30,0.06) 0%, transparent 60%)',
-          ].join(', '),
-        }}
+        className="pointer-events-none absolute inset-0 z-[2]"
         aria-hidden="true"
+        style={{
+          background:
+            'linear-gradient(90deg, rgba(9,11,9,0.92) 0%, rgba(9,11,9,0.68) 36%, rgba(9,11,9,0.15) 70%, transparent 92%)',
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-48"
+        aria-hidden="true"
+        style={{ background: 'linear-gradient(to top, rgba(9,11,9,0.96) 0%, transparent 100%)' }}
       />
 
-      {/* Dynamic Showreel Ambient Background Color Glow */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-40 transition-opacity duration-1000"
-        style={{
-          background: `radial-gradient(ellipse 65% 55% at 80% 40%, ${activeProject.glowColor}, transparent)`,
-        }}
-        aria-hidden="true"
-      />
-
-      {/* Cinematic ambient breathe overlay */}
-      <div className="absolute inset-0 hero-cinematic-bg pointer-events-none" aria-hidden="true" />
-
-      {/* Restrained CSS ember particles */}
-      <div className="ember-container" aria-hidden="true">
-        <div className="ember ember-1" />
-        <div className="ember ember-2" />
-        <div className="ember ember-3" />
-        <div className="ember ember-4" />
-        <div className="ember ember-5" />
-      </div>
-
-      {/* Subtle Architectural Grid Lines */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.05] grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 max-w-7xl mx-auto px-6 md:px-12"
-        aria-hidden="true"
-      >
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="border-r border-warm-white h-full" />
-        ))}
-      </div>
-
-      {/* Chapter 01 Meta Tag */}
-      <div className="relative z-10 max-w-7xl mx-auto w-full pt-2 flex items-center justify-between border-b border-charcoal-800/80 pb-4">
-        <div className="flex items-center gap-3">
-          <span className="w-2 h-2 rounded-full bg-lime shadow-[0_0_10px_rgba(212,255,0,0.8)] animate-pulse" />
-          <span className="font-mono text-[0.65rem] tracking-[0.25em] text-lime font-bold uppercase">
-            CHAPTER 01 &mdash; THE OPENING
-          </span>
-        </div>
-        <div className="hidden sm:flex items-center gap-4 font-mono text-[0.62rem] text-warm-dim tracking-widest">
-          <span>PORTFOLIO SHOWREEL</span>
-          <span className="text-charcoal-700">/</span>
-          <span className="text-warm-muted">0{activeProjectIndex + 1} OF 0{projects.length}</span>
-        </div>
-      </div>
-
-      {/* Main Hero Grid: Typographic Statement + Interactive Portfolio Showreel */}
-      <div className="relative z-10 max-w-7xl mx-auto w-full my-auto py-8 sm:py-12 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
-        {/* Left Column: Monumental Headline, Supporting Copy, and Dual CTAs */}
-        <div className="lg:col-span-7 space-y-6 sm:space-y-8">
-          <div className="space-y-1 sm:space-y-2">
-            <div className="overflow-hidden">
-              <motion.h1
-                initial={{ y: '105%', opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.85, ease: EASE_EDITORIAL }}
-                className="display-hero text-warm-white"
-              >
-                WE DESIGN
-              </motion.h1>
-            </div>
-            <div className="overflow-hidden">
-              <motion.div
-                initial={{ y: '105%', opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.9, delay: 0.15, ease: EASE_EDITORIAL }}
-                className="display-hero text-warm-white flex items-baseline flex-wrap"
-              >
-                <span>IDENTITIES</span>
-                <span className="text-lime text-glow-lime ml-1">.</span>
-              </motion.div>
-            </div>
+      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-7xl flex-1 flex-col px-6 pb-10 pt-28 sm:pt-32 md:px-12 lg:px-16">
+        {/* Top meta row */}
+        <motion.div
+          initial={fadeHidden(12)}
+          animate={started ? fade(0.05) : fadeHidden(12)}
+          className="flex items-center justify-between border-b border-white/[0.08] pb-4"
+        >
+          <div className="flex items-center gap-3">
+            <span className="h-1.5 w-1.5 rounded-full bg-lime shadow-[0_0_10px_rgba(200,245,47,0.8)]" />
+            <span className="font-mono text-[0.62rem] font-bold uppercase tracking-[0.34em] text-lime">
+              V&nbsp;DESIGN
+            </span>
           </div>
+          <span className="hidden font-mono text-[0.6rem] uppercase tracking-[0.3em] text-warm-white/40 sm:block">
+            Creative Studio — Portfolio 2026
+          </span>
+        </motion.div>
 
-          {/* Supporting copy */}
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.35, ease: EASE_EDITORIAL }}
-            className="text-base sm:text-lg md:text-xl font-space font-light text-warm-muted tracking-tight leading-relaxed max-w-lg"
+        {/* Main typographic statement + Proof cards */}
+        <div className="flex flex-1 flex-col justify-center py-8 sm:py-12">
+          {/* Status pill badge inspired by Reference 1 */}
+          <motion.div
+            initial={fadeHidden(14)}
+            animate={started ? fade(0.08) : fadeHidden(14)}
+            className="mb-5 inline-flex items-center gap-2.5 self-start rounded-full border border-lime/25 bg-charcoal-900/85 px-4 py-1.5 backdrop-blur-md shadow-sm"
           >
-            We build distinctive brands, digital experiences, and cinematic visuals that help businesses stand apart.
+            <span className="h-1.5 w-1.5 rounded-full bg-lime shadow-[0_0_8px_#C8F52F] animate-pulse" />
+            <span className="font-mono text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-lime">
+              Available for Commissions · 2026
+            </span>
+          </motion.div>
+
+          {/* Headline on the visually quieter side */}
+          <h1 className="display-cinematic max-w-[15ch] text-warm-white">
+            <span className="block overflow-hidden pb-[0.06em]">
+              <motion.span
+                className="block"
+                initial={hiddenLine}
+                animate={started ? showLine(0.12) : hiddenLine}
+              >
+                Creative
+              </motion.span>
+            </span>
+            <span className="block overflow-hidden pb-[0.06em]">
+              <motion.span
+                className="block"
+                initial={hiddenLine}
+                animate={started ? showLine(0.24) : hiddenLine}
+              >
+                Direction For
+              </motion.span>
+            </span>
+            <span className="block overflow-hidden pb-[0.06em]">
+              <motion.span
+                className="block"
+                initial={hiddenLine}
+                animate={started ? showLine(0.36) : hiddenLine}
+              >
+                Bold Brands<span className="text-lime">.</span>
+              </motion.span>
+            </span>
+          </h1>
+
+          <motion.p
+            initial={fadeHidden(18)}
+            animate={started ? fade(0.55) : fadeHidden(18)}
+            className="mt-6 max-w-xl font-space text-base font-light leading-relaxed tracking-tight text-warm-white/70 sm:text-lg md:text-xl"
+          >
+            V&nbsp;DESIGN is an independent studio shaping brand identities, visual storytelling and
+            website experiences — crafted with intention.
           </motion.p>
 
-          {/* Primary CTA and Secondary Navigation CTA */}
+          {/* CTAs: Clear START A PROJECT + EXPLORE WORK */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5, ease: EASE_EDITORIAL }}
-            className="flex flex-wrap items-center gap-4 sm:gap-5 pt-2"
+            initial={fadeHidden(20)}
+            animate={started ? fade(0.7) : fadeHidden(20)}
+            className="mt-8 flex flex-wrap items-center gap-4"
           >
-            {/* Primary CTA: EXPLORE OUR WORK */}
-            <button
-              type="button"
-              onClick={scrollToWork}
-              className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-full bg-lime hover:bg-lime-hover text-charcoal-950 font-space text-xs sm:text-sm font-bold tracking-[0.2em] uppercase transition-all duration-300 shadow-[0_0_30px_rgba(212,255,0,0.35)] hover:shadow-[0_0_45px_rgba(212,255,0,0.55)] cursor-pointer"
-              aria-label="Explore the work of V DESIGN"
-            >
-              <span>EXPLORE OUR WORK</span>
-              <ArrowDown
-                size={16}
-                className="text-charcoal-950 transform group-hover:translate-y-1 transition-transform"
-              />
-            </button>
-
-            {/* Secondary CTA: START A PROJECT */}
             <button
               type="button"
               onClick={scrollToContact}
-              className="group inline-flex items-center gap-3 px-7 py-4 rounded-full border border-charcoal-700 hover:border-lime bg-charcoal-900/60 hover:bg-charcoal-900 text-warm-white hover:text-lime font-space text-xs sm:text-sm font-bold tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer"
+              className="pill-btn-lime group cursor-pointer text-xs font-bold sm:text-sm !py-3.5 !px-8"
               aria-label="Start a project with V DESIGN"
             >
               <span>START A PROJECT</span>
-              <ArrowUpRight
-                size={16}
-                className="text-lime transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
-              />
+              <ArrowUpRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </button>
+
+            <button
+              type="button"
+              onClick={scrollToWork}
+              className="pill-btn-dark group cursor-pointer text-xs font-semibold sm:text-sm !py-3.5 !px-7"
+              aria-label="Explore the portfolio work of V DESIGN"
+            >
+              <span>EXPLORE WORK</span>
+              <ArrowDown size={15} className="transition-transform duration-200 group-hover:translate-y-0.5" />
+            </button>
+          </motion.div>
+
+          {/* Wayfare Reference-1 inspired floating proof cards (Desktop) */}
+          <motion.div
+            initial={fadeHidden(24)}
+            animate={started ? fade(0.85) : fadeHidden(24)}
+            className="mt-12 hidden grid-cols-1 gap-4 sm:grid-cols-2 lg:grid lg:max-w-2xl"
+          >
+            <div className="rounded-2xl border border-white/[0.08] bg-[#141712]/75 p-4 backdrop-blur-md transition-all duration-300 hover:border-lime/30">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[0.6rem] uppercase tracking-widest text-lime">
+                  SELECTED WORK
+                </span>
+                <span className="h-1.5 w-1.5 rounded-full bg-lime/80" />
+              </div>
+              <p className="mt-1 font-display text-xl font-bold text-warm-white">
+                04 Curated Brands
+              </p>
+              <p className="mt-0.5 font-sans text-xs text-warm-muted">
+                A² · Wellfit · SBG · Krishika Shree
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-white/[0.08] bg-[#141712]/75 p-4 backdrop-blur-md transition-all duration-300 hover:border-lime/30">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[0.6rem] uppercase tracking-widest text-lime">
+                  STUDIO ETHOS
+                </span>
+                <span className="h-1.5 w-1.5 rounded-full bg-lime/80" />
+              </div>
+              <p className="mt-1 font-display text-xl font-bold text-warm-white">
+                100% Bespoke Craft
+              </p>
+              <p className="mt-0.5 font-sans text-xs text-warm-muted">
+                Zero templates · Built with intention
+              </p>
+            </div>
           </motion.div>
         </div>
 
-        {/* Right Column: Dynamic Cinematic Showreel Visual Stage */}
-        <div className="lg:col-span-5 relative">
-          <div className="relative rounded-2xl border border-charcoal-700/80 bg-charcoal-900/80 p-4 sm:p-5 backdrop-blur-xl shadow-2xl overflow-hidden group">
-            {/* Showreel Top Bar */}
-            <div className="flex items-center justify-between border-b border-charcoal-800 pb-3 mb-3 text-[0.65rem] font-mono">
-              <div className="flex items-center gap-2 text-warm-white">
-                <Play size={12} className="text-lime fill-lime" />
-                <span className="font-bold tracking-widest">SHOWREEL STAGE</span>
-              </div>
-              <div className="flex items-center gap-2 text-warm-dim">
-                <span className="w-1.5 h-1.5 rounded-full bg-lime animate-ping" />
-                <span className="tracking-wider text-lime">LIVE PREVIEW</span>
-              </div>
-            </div>
-
-            {/* Main Stage Artwork Container */}
-            <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-charcoal-950 flex items-center justify-center border border-charcoal-800/80">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeProject.id}
-                  initial={{ opacity: 0, scale: 0.94 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.04 }}
-                  transition={{ duration: 0.65, ease: EASE_EDITORIAL }}
-                  className="relative w-full h-full flex items-center justify-center p-6"
-                >
-                  <img
-                    src={activeProject.image}
-                    alt={`${activeProject.title} — ${activeProject.category}`}
-                    className="max-h-full max-w-full object-contain filter contrast-[1.03] drop-shadow-2xl transition-transform duration-700 group-hover:scale-105"
-                  />
-
-                  {/* Artwork Tag Badge */}
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between p-3 rounded-lg bg-charcoal-950/85 backdrop-blur-md border border-charcoal-800/90 text-left">
-                    <div>
-                      <span className="font-mono text-[0.6rem] text-lime font-bold block">
-                        {activeProject.number} &mdash; {activeProject.category}
-                      </span>
-                      <h4 className="font-display font-bold text-sm sm:text-base text-warm-white uppercase tracking-tight">
-                        {activeProject.title}
-                      </h4>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={scrollToWork}
-                      className="p-2 rounded-md bg-charcoal-800 hover:bg-lime text-warm-white hover:text-charcoal-950 transition-colors"
-                      title="View Project"
-                    >
-                      <ArrowUpRight size={14} />
-                    </button>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            {/* Interactive Thumbnail Carousel Ticker (Allows user to click through the 4 projects) */}
-            <div className="grid grid-cols-4 gap-2 pt-3">
-              {projects.map((proj, idx) => {
-                const isCurrent = idx === activeProjectIndex;
-                return (
-                  <button
-                    key={proj.id}
-                    type="button"
-                    onClick={() => {
-                      setActiveProjectIndex(idx);
-                      setIsPlaying(false);
-                    }}
-                    className={`relative rounded-lg overflow-hidden border p-1 text-left transition-all ${
-                      isCurrent
-                        ? 'border-lime bg-lime/10 shadow-[0_0_12px_rgba(212,255,0,0.3)]'
-                        : 'border-charcoal-800 bg-charcoal-950 hover:border-charcoal-700 opacity-60 hover:opacity-100'
-                    }`}
-                  >
-                    <div className="aspect-square w-full rounded overflow-hidden bg-charcoal-900 flex items-center justify-center mb-1">
-                      <img
-                        src={proj.image}
-                        alt={proj.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <span className="font-mono text-[0.55rem] font-bold block truncate text-warm-white">
-                      {proj.number}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Scroll Cue */}
-      <div className="relative z-10 max-w-7xl mx-auto w-full pt-4 flex items-center justify-between text-warm-dim font-mono text-[0.62rem]">
-        <div className="flex items-center gap-2 text-lime font-semibold">
-          <Sparkles size={12} />
-          <span>V DESIGN &mdash; INDEPENDENT CREATIVE STUDIO</span>
-        </div>
-        <button
-          type="button"
-          onClick={scrollToWork}
-          className="flex items-center gap-2 text-warm-muted hover:text-lime transition-colors group cursor-pointer"
+        {/* Bottom row — scroll indicator + studio meta */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={
+            started
+              ? { opacity: 1, transition: reduce ? { duration: 0.4 } : { duration: 0.8, delay: 0.9, ease: EASE } }
+              : { opacity: 0 }
+          }
+          className="flex items-end justify-between border-t border-white/[0.08] pt-5"
         >
-          <span>SCROLL TO EXPLORE</span>
-          <ArrowDown size={12} className="group-hover:translate-y-0.5 transition-transform text-lime" />
-        </button>
+          <button
+            type="button"
+            onClick={scrollToWork}
+            className="group flex items-center gap-3 font-mono text-[0.62rem] uppercase tracking-[0.28em] text-warm-white/50 transition-colors hover:text-lime focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime"
+          >
+            <span className="relative block h-8 w-px overflow-hidden bg-white/15">
+              <span className="scroll-line absolute inset-0 block bg-lime" />
+            </span>
+            <span>Scroll to explore</span>
+          </button>
+          <span className="hidden font-mono text-[0.6rem] uppercase tracking-[0.28em] text-warm-white/35 md:block">
+            Independent by design — Est. 2026
+          </span>
+        </motion.div>
       </div>
     </section>
   );
